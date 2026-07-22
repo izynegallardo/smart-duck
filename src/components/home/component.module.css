@@ -96,6 +96,7 @@
         top: 3px;
         background: white;
         border-radius: 50%;
+        box-shadow: 1px 1px 10px black;
         transition: 0.2s;
     }
 
@@ -115,7 +116,8 @@
             border-top: 0.15em solid var(--accent-bg);
             border-bottom: 0.15em solid var(--accent-bg);
             padding: 1%;
-            height: 35px;
+            height: 30px;
+            background-color: var(--accent-bg);
 
             .center-top-ul {
                 list-style-type: none;
@@ -151,6 +153,12 @@
     .bottom {
         display: flex;
         gap: 1em;
+        padding: 1% 0;
+
+        .bottom-left {
+            display: flex;
+            gap: 1em;
+        }
 
         .bottom-left-checkbox {
             display: flex;

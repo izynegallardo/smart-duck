@@ -14,7 +14,7 @@ export default function Header(root) {
         </section>
                 
         <section class='${styles['right']}'>
-            <i class="fa-solid fa-moon"></i>
+            <i class="fa-solid fa-moon" style="color: rgb(255, 212, 59);"></i>
         </section>
     `
     root.className = styles['header']

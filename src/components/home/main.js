@@ -28,8 +28,8 @@ export default function Main(root) {
         <section class='${styles['center']}'>
             <div class='${styles['center-top']}'>
                 <ul class='${styles['center-top-ul']}'>
-                    <li class='${styles['center-top-ul-li']}'>0 <span class='${styles['center-top-ul-li-span']}'>tabs</span></li>
-                    <li class='${styles['center-top-ul-li']}'>0 <span class='${styles['center-top-ul-li-span']}'>playing</span></li>
+                    <li class='${styles['center-top-ul-li']}'>0 <span class='${styles['center-top-ul-li-span']}'>tabs |</span></li>
+                        <li class='${styles['center-top-ul-li']}'>0 <span class='${styles['center-top-ul-li-span']}'>playing |</span></li>
                     <li class='${styles['center-top-ul-li']}'>0 <span class='${styles['center-top-ul-li-span']}'>ducked</span></li>
                 </ul>
             </div>
@@ -39,16 +39,18 @@ export default function Main(root) {
         </section>
         
         <section class='${styles['bottom']}'>
-            <div class='${styles['bottom-left-checkbox']}'>
-                ${IconContainer({
-                    icon: 'fa-solid fa-microphone',
-                    color: '#125678',
-                })}
-            </div>
-            <div class='${styles['bottom-center-checkbox']}'>
-                <label for='checkbox-detection'>Voice Detection</label>
-                <span class='${styles['bottom-center-span']}'>BETA</span>
-                <p>Ducks background audio when your voice is detected. Experimental feature.</p>
+            <div id='bottom-left' class='${styles['bottom-left']}'>
+                <div class='${styles['bottom-left-checkbox']}'>
+                    ${IconContainer({
+                        icon: 'fa-solid fa-microphone',
+                        color: '#125678',
+                    })}
+                </div>
+                <div class='${styles['bottom-center-checkbox']}'>
+                    <label for='checkbox-detection'>Voice Detection</label>
+                    <span class='${styles['bottom-center-span']}'>BETA</span>
+                    <p>Ducks background audio when a voice is detected. Experimental feature.</p>
+                </div>
             </div>
             <div class='${styles['bottom-right-checkbox']}'>
                 <label class='${styles['checkbox-switch']}'>

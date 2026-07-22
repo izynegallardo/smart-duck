@@ -36,15 +36,22 @@ export default function Event() {
     }
 
     function handleVoiceDetection() {
-        const checkboxDectection = document.getElementById('checkbox-detection')
+        const checkboxDetection = document.getElementById('checkbox-detection')
+        const bottomLeft = document.getElementById('bottom-left')
 
-        checkboxDectection.addEventListener('change', (e) => {
-            if (e.target.checked) {
-                console.log('Voice Detection Enable')
+        function updateUI() {
+            if (checkboxDetection.checked) {
+                console.log('Voice Detection Enabled')
+                bottomLeft.style.opacity = '1'
             } else {
                 console.log('Voice Detection Disabled')
+                bottomLeft.style.opacity = '0.4'
             }
-        })
+        }
+
+        updateUI()
+
+        checkboxDetection.addEventListener('change', updateUI)
     }
 
     handleAutoDuck()
