@@ -1,0 +1,32 @@
+.header {
+    display: flex;
+    justify-content: space-between;
+    text-align: left;
+    border-bottom: 0.15em solid var(--accent-bg);
+    padding: 0 0 2%;
+    width: 100%;
+
+    .left {
+        display: flex;
+        place-items: center;
+        gap: 1em;
+
+        h1 {
+            font-size: 1rem;
+        }
+
+        p {
+            opacity: 0.7;
+        }
+    }
+
+    .right {
+        display: flex;
+        place-items: center;
+        gap: 1em;
+
+        i {
+            width: 30px;
+        }
+    }
+}

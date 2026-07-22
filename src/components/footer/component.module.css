@@ -1,0 +1,26 @@
+.footer {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    gap: 1em;
+    width: 100%;
+    border-top: 0.15em solid var(--accent-bg);
+    padding: 5% 0 0;
+    text-align: left;
+
+    .top {
+        margin: 0 auto;
+    }
+
+    .bottom {
+        display: flex;
+        justify-content: space-between;
+
+        .bottom-left,
+        .bottom-right {
+            p {
+                display: inline-block;
+            }
+        }
+    }
+}

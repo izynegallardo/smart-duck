@@ -1,0 +1,182 @@
+.main {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+    gap: 1em 0;
+    width: 100%;
+
+    label {
+        font-weight: 750;
+    }
+
+    .top {
+        display: flex;
+        flex-direction: column;
+        gap: 1em;
+
+        .top-checkbox {
+            display: flex;
+            justify-content: space-between;
+
+            .top-left-checkbox {
+                text-align: left;
+            }
+        }
+
+        .top-range {
+            padding: 0 0 1%;
+
+            .top-range-left {
+                display: flex;
+                justify-content: space-between;
+            }
+
+            input[type='range'] {
+                appearance: none;
+                width: 99.2%;
+                height: 4px;
+                border-radius: 999px;
+                outline: none;
+            }
+
+            input[type='range']::-webkit-slider-thumb {
+                appearance: none;
+                width: 18px;
+                height: 18px;
+                border-radius: 50%;
+                background: white;
+                border: 3px solid var(--accent-border);
+                cursor: pointer;
+            }
+
+            input[type='range']::-moz-range-thumb {
+                width: 18px;
+                height: 18px;
+                border-radius: 50%;
+                background: white;
+                border: 3px solid var(--accent-border);
+                cursor: pointer;
+            }
+        }
+    }
+
+    .top-right-checkbox,
+    .bottom-right-checkbox {
+        display: flex;
+        place-items: center;
+    }
+
+    .checkbox-switch {
+        position: relative;
+        display: inline-block;
+        width: 50px;
+        height: 28px;
+    }
+
+    .checkbox-switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+    }
+
+    .checkbox-slider {
+        position: absolute;
+        inset: 0;
+        background: var(--accent-border);
+        border-radius: 999px;
+        transition: 0.2s;
+    }
+
+    .checkbox-slider::before {
+        content: '';
+        position: absolute;
+        width: 22px;
+        height: 22px;
+        left: 24px; /* checked position */
+        top: 3px;
+        background: white;
+        border-radius: 50%;
+        transition: 0.2s;
+    }
+
+    .checkbox-switch input:not(:checked) + .checkbox-slider {
+        background: #ccc;
+    }
+
+    .checkbox-switch input:not(:checked) + .checkbox-slider::before {
+        left: 3px;
+    }
+
+    .center {
+        .center-top {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            border-top: 0.15em solid var(--accent-bg);
+            border-bottom: 0.15em solid var(--accent-bg);
+            padding: 1%;
+            height: 35px;
+
+            .center-top-ul {
+                list-style-type: none;
+                text-align: left;
+                margin: 0;
+                padding: 0;
+
+                .center-top-ul-li {
+                    display: inline;
+                    font-weight: 700;
+
+                    .center-top-ul-li-span {
+                        font-weight: normal;
+                    }
+                }
+            }
+        }
+
+        .center-bottom {
+            display: flex;
+            flex-direction: column;
+            place-items: center;
+            border-bottom: 0.15em solid var(--accent-bg);
+            height: 225px;
+            overflow-y: auto;
+
+            .center-bottom-p {
+                margin: 30% 0;
+            }
+        }
+    }
+
+    .bottom {
+        display: flex;
+        gap: 1em;
+
+        .bottom-left-checkbox {
+            display: flex;
+            place-items: center;
+
+            .icon-container {
+                width: 2.625em;
+                height: 2.625em;
+                flex: 0 0 2.625em;
+                display: grid;
+                place-items: center;
+                border-radius: 0.625em;
+                color: white;
+                font-size: 1.125rem;
+            }
+        }
+
+        .bottom-center-checkbox {
+            text-align: left;
+
+            .bottom-center-span {
+                padding: 1% 4%;
+                border-radius: 0.3125em;
+                background-color: var(--accent-border);
+                font-weight: 500;
+            }
+        }
+    }
+}
