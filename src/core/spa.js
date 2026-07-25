@@ -5,7 +5,7 @@ class SPA {
         this.context = {
             root: config?.root || document.querySelector('#app'),
         }
-        this.defaultRoute = () => {}
+        this.defaultRoute = config?.defaultRoute ? config.defaultRoute.bind(this.context) : () => {}
     }
 
     add(path, cb) {

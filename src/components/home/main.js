@@ -33,7 +33,7 @@ export default function Main(root) {
                     <li class='${styles['center-top-ul-li']}'>0 <span class='${styles['center-top-ul-li-span']}'>ducked</span></li>
                 </ul>
             </div>
-            <div class='${styles['center-bottom']}'>
+            <div id='center-bottom-tab-div' class='${styles['center-bottom']}'>
                 <p class='${styles['center-bottom-p']}'>No active tabs</p>
             </div>
         </section>

@@ -5,7 +5,7 @@
     gap: 1em;
     width: 100%;
     border-top: 0.15em solid var(--accent-bg);
-    padding: 5% 0 0;
+    padding: 2.5% var(--content-gutter);
     text-align: left;
     background-color: var(--accent-bg);
 

@@ -13,6 +13,7 @@
         display: flex;
         flex-direction: column;
         gap: 1em;
+        padding: 0 var(--content-gutter);
 
         .top-checkbox {
             display: flex;
@@ -61,7 +62,7 @@
     }
 
     .top-right-checkbox,
-    .bottom-right-checkbox {
+    .center-right-checkbox .bottom-right-checkbox {
         display: flex;
         place-items: center;
     }
@@ -73,13 +74,18 @@
         height: 28px;
     }
 
+    .s-checkbox-switch {
+        height: 20px;
+    }
+
     .checkbox-switch input {
         opacity: 0;
         width: 0;
         height: 0;
     }
 
-    .checkbox-slider {
+    .checkbox-slider,
+    .s-checkbox-slider {
         position: absolute;
         inset: 0;
         background: var(--accent-border);
@@ -100,6 +106,19 @@
         transition: 0.2s;
     }
 
+    .s-checkbox-slider::before {
+        content: '';
+        position: absolute;
+        width: 14px;
+        height: 14px;
+        left: 32px; /* checked position */
+        top: 3px;
+        background: white;
+        border-radius: 50%;
+        box-shadow: 1px 1px 10px black;
+        transition: 0.2s;
+    }
+
     .checkbox-switch input:not(:checked) + .checkbox-slider {
         background: #ccc;
     }
@@ -111,11 +130,12 @@
     .center {
         .center-top {
             display: flex;
-            flex-direction: column;
-            justify-content: center;
+            flex-direction: row;
+            justify-content: space-between;
+            align-items: center;
             border-top: 0.15em solid var(--accent-bg);
             border-bottom: 0.15em solid var(--accent-bg);
-            padding: 1%;
+            padding: 1% var(--content-gutter);
             height: 30px;
             background-color: var(--accent-bg);
 
@@ -134,6 +154,12 @@
                     }
                 }
             }
+
+            .center-top-button {
+                display: inline;
+                width: 35%;
+                font-size: 0.6rem;
+            }
         }
 
         .center-bottom {
@@ -141,11 +167,12 @@
             flex-direction: column;
             place-items: center;
             border-bottom: 0.15em solid var(--accent-bg);
-            height: 225px;
+            height: 220px;
+            padding: 0 var(--content-gutter);
             overflow-y: auto;
 
             .center-bottom-p {
-                margin: 30% 0;
+                margin: 28% 0;
             }
         }
     }
@@ -153,7 +180,7 @@
     .bottom {
         display: flex;
         gap: 1em;
-        padding: 1% 0;
+        padding: 1% var(--content-gutter);
 
         .bottom-left {
             display: flex;
