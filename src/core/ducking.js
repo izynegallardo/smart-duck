@@ -3,35 +3,31 @@ export function toVolumeMultiplier(duckLevel) {
 }
 
 export function findMediaElements(root = document) {
-    // your code here
     return [...root.querySelectorAll('audio, video')]
 }
 
 const original = new WeakMap()
 
-export function duck(el, duckLevel) {
-    // your code here
-    if (!original.has(el)) {
-        original.set(el, el.volume)
+export function duck(element, duckLevel) {
+    if (!original.has(element)) {
+        original.set(element, element.volume)
     }
-    el.volume = original.get(el) * toVolumeMultiplier(duckLevel)
+    element.volume = original.get(element) * toVolumeMultiplier(duckLevel)
 }
 
-export function unduck(el) {
-    // your code here
-    if (original.has(el)) {
-        el.volume = original.get(el)
-        original.delete(el)
+export function unduck(element) {
+    if (original.has(element)) {
+        element.volume = original.get(element)
+        original.delete(element)
     }
 }
 
-export function describeMedia(el, index) {
-    // your code here
+export function describeMedia(element, index) {
     return {
         index,
-        tag: el.tagName.toLowerCase(),
-        playing: !el.paused,
-        volume: el.volume,
-        src: el.currentSrc || el.src,
+        tag: element.tagName.toLowerCase(),
+        playing: !element.paused,
+        volume: element.volume,
+        src: element.currentSrc || element.src,
     }
 }
