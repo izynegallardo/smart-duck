@@ -1,5 +1,6 @@
-import { findMediaElements, duck, unduck } from '@/core/ducking'
+import { findMediaElements, duck, unduck, describeMedia } from '@/core/ducking'
 import { getSettings, watchSettings } from '@/core/storage'
+import { MSG, sendMessage } from '@/core/messaging'
 import debounce from '@/utils/debounce'
 
 export default defineContentScript({
@@ -7,20 +8,24 @@ export default defineContentScript({
     async main() {
         let settings = await getSettings()
 
+        let isDucked = false
+
         function applyDuckState() {
             let mediaElements = findMediaElements()
-            let shouldDuck = false
 
-            if (settings.autoDuckEnabled && document.visibilityState !== 'visible') {
-                shouldDuck = true
-            }
+            isDucked = settings.autoDuckEnabled && document.visibilityState !== 'visible'
 
             mediaElements.forEach((element) => {
-                if (shouldDuck) {
+                if (isDucked) {
                     duck(element, settings.duckLevel)
                 } else {
                     unduck(element)
                 }
+            })
+
+            sendMessage(MSG.MEDIA_STATE_CHANGED, {
+                ducked: isDucked,
+                elements: mediaElements.map(describeMedia),
             })
         }
 
@@ -34,6 +39,15 @@ export default defineContentScript({
         watchSettings((newSettings) => {
             settings = newSettings
             applyDuckState()
+        })
+
+        browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
+            if (message.type === MSG.GET_STATE) {
+                sendResponse({
+                    ducked: isDucked,
+                    elements: findMediaElements().map(describeMedia),
+                })
+            }
         })
     },
 })
