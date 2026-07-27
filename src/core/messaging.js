@@ -3,6 +3,7 @@ export const MSG = {
     MEDIA_STATE_CHANGED: 'MEDIA_STATE_CHANGED',
     SETTINGS_UPDATED: 'SETTINGS_UPDATED',
     GET_SUMMARY: 'GET_SUMMARY',
+    SUMMARY_CHANGED: 'SUMMARY_CHANGED',
 }
 
 export function sendMessage(type, payload) {

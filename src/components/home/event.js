@@ -2,6 +2,7 @@ import styles from './component.module.css'
 import IconContainer from './icon'
 import toggleTheme from '@/utils/toggleTheme'
 import rate from '@/utils/rate'
+import { MSG, sendMessage } from '@/core/messaging'
 
 export default function Event() {
     try {
@@ -48,42 +49,14 @@ export default function Event() {
             })
         }
 
-        let tabs = [
-            {
-                icon: 'browser.tab.favicon',
-                name: 'Youtube',
-                domain: 'youtube.com',
-                status: 'stopped', // stopped, playing, ducked
-                currentVol: 20,
-                isPrimary: false,
-                isPinned: false,
-                order: 3,
-            },
-            {
-                icon: 'browser.tab.favicon',
-                name: 'Spotify',
-                domain: 'open.spotify.com',
-                status: 'ducked', // stopped, playing, ducked
-                currentVol: 20,
-                isPrimary: false,
-                isPinned: true,
-                order: 2,
-            },
-            {
-                icon: 'browser.tab.favicon',
-                name: 'Scrimba',
-                domain: 'scrimba.com',
-                status: 'playing', // stopped, playing, ducked
-                currentVol: 80,
-                isPrimary: true,
-                isPinned: true,
-                order: 1,
-            },
-        ]
-        function renderActiveTabs() {
-            let container = ''
+        function renderStats(summary) {
+            document.getElementById('stat-tabs').textContent = summary.tabs
+            document.getElementById('stat-playing').textContent = summary.playing
+            document.getElementById('stat-ducked').textContent = summary.ducked
+        }
 
-            if (!tabs.length) return
+        function renderActiveTabs(tabs) {
+            let container = ''
 
             tabs.map((tab) => {
                 let waveBars = ''
@@ -102,38 +75,52 @@ export default function Event() {
                 }
 
                 container += `
-                    <div class='${styles['center-bottom-tabs']}'>
+                        <div class="${styles['center-bottom-tabs']} ${tab.status === 'playing' ? styles.playing : ''}">
                         <section class='${styles['center-bottom-tabs-left']}'>
                             ${IconContainer({
                                 icon: tab.icon,
-                                color: 'red',
                                 label: `${tab.name} icon`,
                             })}
                         </section>
                         
                         <section class='${styles['center-bottom-tabs-center']}'>
                             <div class='${styles['center-bottom-tabs-center-top']}'>
-                                <div style='width:100%'>
-                                    <label for='range'>${tab.name}</label>
+                                <div style='width:80%'>
+                                    <label for='${tab.id}'>${tab.name}</label>
                                     <p style='opacity: 0.8'>${tab.domain}</p>
                                 </div>
                                 ${waveBars}
                             </div>
                             <div class='${styles['center-bottom-tabs-center-bottom']}'>
-                                <input id='range' type="range" min="0" max="100" value="${tab.currentVol}">
+                                <input id='${tab.id}' type="range" min="0" max="100" value="20">
                             </div>
                         </section>
                         
                         <section class='${styles['center-bottom-tabs-right']}'>
                                 <i class="fa-solid fa-volume"></i>
-                                <span id="value">${tab.currentVol}%</span>
+                                <span>20%</span>
                         </section>
                     </div>
                 `
             })
 
-            centerButtom.innerHTML = container
+            centerButtom.innerHTML = tabs.length
+                ? container
+                : `<p class='${styles['center-bottom-p']}'>No active tabs</p>`
         }
+
+        function renderSummary(summary) {
+            renderStats(summary)
+            renderActiveTabs(summary.list)
+        }
+
+        sendMessage(MSG.GET_SUMMARY).then(renderSummary)
+
+        browser.runtime.onMessage.addListener((message) => {
+            if (message.type === MSG.SUMMARY_CHANGED) {
+                renderSummary(message.payload)
+            }
+        })
 
         function handleVoiceDetection() {
             const checkboxDetection = document.getElementById('checkbox-detection')
@@ -159,7 +146,6 @@ export default function Event() {
         handleAutoDuck()
         updateRange()
         handleDuckLevel()
-        renderActiveTabs()
         handleVoiceDetection()
     } catch (error) {
         console.log('Home Event:', error)

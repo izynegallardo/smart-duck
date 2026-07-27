@@ -28,9 +28,9 @@ export default function Main(root) {
         <section class='${styles['center']}'>
             <div class='${styles['center-top']}'>
                 <ul class='${styles['center-top-ul']}'>
-                    <li class='${styles['center-top-ul-li']}'>0 <span class='${styles['center-top-ul-li-span']}'>tabs |</span></li>
-                        <li class='${styles['center-top-ul-li']}'>0 <span class='${styles['center-top-ul-li-span']}'>playing |</span></li>
-                    <li class='${styles['center-top-ul-li']}'>0 <span class='${styles['center-top-ul-li-span']}'>ducked</span></li>
+                    <li class='${styles['center-top-ul-li']}'><span id='stat-tabs'>0</span> <span class='${styles['center-top-ul-li-span']}'>tabs |</span></li>
+                    <li class='${styles['center-top-ul-li']}'><span id='stat-playing'>0</span> <span class='${styles['center-top-ul-li-span']}'>playing |</span></li>
+                    <li class='${styles['center-top-ul-li']}'><span id='stat-ducked'>0</span> <span class='${styles['center-top-ul-li-span']}'>ducked</span></li>
                 </ul>
             </div>
             <div id='center-bottom' class='${styles['center-bottom']}'>
@@ -43,7 +43,6 @@ export default function Main(root) {
                 <div class='${styles['bottom-left-checkbox']}'>
                     ${IconContainer({
                         icon: 'fa-solid fa-microphone',
-                        color: '#125678',
                     })}
                 </div>
                 <div class='${styles['bottom-center-checkbox']}'>
