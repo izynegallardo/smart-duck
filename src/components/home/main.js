@@ -18,7 +18,7 @@ export default function Main(root) {
                 </div>
             <div class='${styles['top-range']}'>
                 <div class='${styles['top-range-left']}'>
-                    <label for='range'>Duck Level</label>
+                    <label for='range'>Background Volume</label>
                     <span id="value">20%</span>
                 </div>
                 <input id='range' type="range" min="0" max="100" value="20">

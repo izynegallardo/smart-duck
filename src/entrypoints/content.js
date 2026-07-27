@@ -1,3 +1,4 @@
+import { browser } from 'wxt/browser'
 import { findMediaElements, duck, unduck, describeMedia } from '@/core/ducking'
 import { getSettings, watchSettings } from '@/core/storage'
 import { MSG, sendMessage } from '@/core/messaging'
@@ -7,13 +8,14 @@ export default defineContentScript({
     matches: ['<all_urls>'],
     async main() {
         let settings = await getSettings()
+        let isPrimary = (await sendMessage(MSG.GET_PRIMARY)).isPrimary
 
         let isDucked = false
 
         function applyDuckState() {
             let mediaElements = findMediaElements()
 
-            isDucked = settings.autoDuckEnabled && document.visibilityState !== 'visible'
+            isDucked = settings.autoDuckEnabled && !isPrimary
 
             mediaElements.forEach((element) => {
                 if (isDucked) {
@@ -26,6 +28,7 @@ export default defineContentScript({
             sendMessage(MSG.MEDIA_STATE_CHANGED, {
                 ducked: isDucked,
                 elements: mediaElements.map(describeMedia),
+                url: location.href,
             })
         }
 
@@ -47,6 +50,11 @@ export default defineContentScript({
                     ducked: isDucked,
                     elements: findMediaElements().map(describeMedia),
                 })
+            }
+
+            if (message.type === MSG.PRIMARY_CHANGED) {
+                isPrimary = message.payload.isPrimary
+                applyDuckState()
             }
         })
     },

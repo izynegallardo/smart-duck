@@ -3,14 +3,16 @@ import IconContainer from './icon'
 import toggleTheme from '@/utils/toggleTheme'
 import rate from '@/utils/rate'
 import { MSG, sendMessage } from '@/core/messaging'
+import { getSettings, updateSettings } from '@/core/storage'
 
 export default function Event() {
     try {
         const centerButtom = document.getElementById('center-bottom')
         const range = document.getElementById('range')
 
-        function handleAutoDuck() {
+        function handleAutoDuck(settings) {
             const checkboxDuck = document.getElementById('checkbox-duck')
+            checkboxDuck.checked = settings.autoDuckEnabled
 
             function updateUI() {
                 if (checkboxDuck.checked) {
@@ -24,7 +26,10 @@ export default function Event() {
 
             updateUI()
 
-            checkboxDuck.addEventListener('change', updateUI)
+            checkboxDuck.addEventListener('change', () => {
+                updateUI()
+                updateSettings({ autoDuckEnabled: checkboxDuck.checked })
+            })
         }
 
         function updateRange() {
@@ -41,11 +46,19 @@ export default function Event() {
 
         range.addEventListener('input', updateRange)
 
-        function handleDuckLevel() {
+        function handleDuckLevel(settings) {
             const value = document.getElementById('value')
+            range.value = settings.duckLevel
+
+            updateRange()
+            value.textContent = `${range.value}%`
 
             range.addEventListener('input', () => {
                 value.textContent = `${range.value}%`
+            })
+
+            range.addEventListener('change', () => {
+                updateSettings({ duckLevel: Number(range.value) })
             })
         }
 
@@ -143,10 +156,12 @@ export default function Event() {
 
         toggleTheme()
         rate()
-        handleAutoDuck()
-        updateRange()
-        handleDuckLevel()
         handleVoiceDetection()
+
+        getSettings().then((settings) => {
+            handleAutoDuck(settings)
+            handleDuckLevel(settings)
+        })
     } catch (error) {
         console.log('Home Event:', error)
     }

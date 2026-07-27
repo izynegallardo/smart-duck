@@ -1,3 +1,5 @@
+import { storage } from '@wxt-dev/storage'
+
 const DEFAULT_SETTINGS = {
     duckLevel: 20,
     autoDuckEnabled: true,

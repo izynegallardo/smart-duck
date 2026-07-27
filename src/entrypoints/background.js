@@ -1,7 +1,10 @@
-import { MSG, sendMessage } from '@/core/messaging'
+import { MSG, sendMessage, sendTabMessage } from '@/core/messaging'
 import truncate from '@/utils/truncate'
+import { browser } from 'wxt/browser'
 
 const tabState = new Map()
+let focusedWindowId = null
+let primaryTabId = null
 
 function computeSummary() {
     const states = [...tabState.values()]
@@ -32,6 +35,8 @@ function broadcastSummary() {
 export default defineBackground(() => {
     browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
         if (message.type === MSG.MEDIA_STATE_CHANGED && sender.tab) {
+            if (message.payload.url !== sender.tab.url) return
+
             if (message.payload.elements.length === 0) {
                 tabState.delete(sender.tab.id)
             } else {
@@ -50,6 +55,12 @@ export default defineBackground(() => {
         if (message.type === MSG.GET_SUMMARY) {
             sendResponse(computeSummary())
         }
+
+        if (message.type === MSG.GET_PRIMARY) {
+            sendResponse({
+                isPrimary: sender.tab?.id === primaryTabId,
+            })
+        }
     })
 
     browser.tabs.onRemoved.addListener((tabId, removeInfo) => {
@@ -57,5 +68,48 @@ export default defineBackground(() => {
         console.log('remove', tabState)
 
         broadcastSummary()
+    })
+
+    browser.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
+        if (changeInfo.status === 'loading' && changeInfo.url) {
+            tabState.delete(tabId)
+            broadcastSummary()
+        }
+    })
+
+    function setPrimaryTab(tabId) {
+        if (tabId === primaryTabId) return
+
+        const oldTabId = primaryTabId
+        primaryTabId = tabId
+
+        if (oldTabId != null) {
+            sendTabMessage(oldTabId, MSG.PRIMARY_CHANGED, { isPrimary: false }).catch(() => {})
+        }
+
+        sendTabMessage(primaryTabId, MSG.PRIMARY_CHANGED, { isPrimary: true }).catch(() => {})
+    }
+
+    ;(async () => {
+        const [activeTab] = await browser.tabs.query({ active: true, lastFocusedWindow: true })
+        if (activeTab) {
+            focusedWindowId = activeTab.windowId
+            setPrimaryTab(activeTab.id)
+        }
+    })()
+
+    browser.windows.onFocusChanged.addListener(async (windowId) => {
+        if (windowId === browser.windows.WINDOW_ID_NONE) return
+        focusedWindowId = windowId
+
+        const [activeTab] = await browser.tabs.query({ active: true, windowId })
+
+        if (activeTab) setPrimaryTab(activeTab.id)
+
+        // console.log(activeTab)
+    })
+
+    browser.tabs.onActivated.addListener(({ tabId, windowId }) => {
+        if (windowId === focusedWindowId) setPrimaryTab(tabId)
     })
 })
