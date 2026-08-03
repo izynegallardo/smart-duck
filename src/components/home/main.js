@@ -1,22 +1,22 @@
 import styles from './component.module.css'
-import IconContainer from './icon'
+import { updateIcons } from '@/helpers/lucide'
 
 export default function Main(root) {
     root.innerHTML = `
-        <section class='${styles['top']}'>
+        <section id='top' class='${styles['top']}'>
             <div class='${styles['top-checkbox']}'>
                 <div class='${styles['top-left-checkbox']}'>
                     <label for='checkbox-duck'>Auto Duck</label>
                     <p>Automatically ducks the background tabs</p>
                 </div>
                 <div class='${styles['top-right-checkbox']}'>
-                    <label class='${styles['checkbox-switch']}'>
+                    <label id='checkbox-switch' class='${styles['checkbox-switch']}'>
                         <input id='checkbox-duck' type="checkbox" checked>
                             <span class='${styles['checkbox-slider']}'></span>
-                        </div>
                     </label>    
                 </div>
-            <div class='${styles['top-range']}'>
+            </div>    
+            <div id='top-range' class='${styles['top-range']}'>
                 <div class='${styles['top-range-left']}'>
                     <label for='range'>Background Volume</label>
                     <span id="value">20%</span>
@@ -41,9 +41,9 @@ export default function Main(root) {
         <section class='${styles['bottom']}'>
             <div id='bottom-left' class='${styles['bottom-left']}'>
                 <div class='${styles['bottom-left-checkbox']}'>
-                    ${IconContainer({
-                        icon: 'fa-solid fa-microphone',
-                    })}
+                    <div class="${styles['icon-container']}" style="background-color: #125678" aria-label="speech">
+                        <i data-lucide="speech"></i>  
+                    </div>
                 </div>
                 <div class='${styles['bottom-center-checkbox']}'>
                     <label for='checkbox-detection'>Voice Detection</label>
@@ -60,5 +60,6 @@ export default function Main(root) {
             </div>
         </section>
     `
+    updateIcons(root)
     root.className = styles['main']
 }

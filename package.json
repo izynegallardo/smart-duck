@@ -19,6 +19,8 @@
         "wxt": "^0.20.27"
     },
     "dependencies": {
-        "@fortawesome/fontawesome-free": "^7.3.1"
+        "@fortawesome/fontawesome-free": "^7.3.1",
+        "bootstrap-icons": "^1.13.1",
+        "lucide": "^1.28.0"
     }
 }

@@ -1,4 +1,5 @@
 import styles from './component.module.css'
+import { updateIcons } from '@/helpers/lucide'
 
 /**
  * Shared header for every page in the popup.
@@ -27,7 +28,7 @@ export default function Header(
         `
         : `
             <div>
-                <i class="fa-solid fa-volume"></i>
+                <i data-lucide="origami"></i>  
             </div>
             <div>
                 <h1>${title}</h1>
@@ -38,7 +39,7 @@ export default function Header(
     const settingsLink = showSettingsLink
         ? `
             <a class='${styles['right-a']}' href='#/settings' aria-label='Settings'>
-                <i class="fa-solid fa-gear"></i>
+                <i data-lucide="settings"></i>  
             </a>
         `
         : ''
@@ -55,5 +56,6 @@ export default function Header(
             ${settingsLink}
         </section>
     `
+    updateIcons(root)
     root.className = styles['header']
 }

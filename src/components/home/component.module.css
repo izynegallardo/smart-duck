@@ -14,6 +14,7 @@
         flex-direction: column;
         gap: 1em;
         padding: 0 var(--content-gutter);
+        transition: gap 0.3s ease;
 
         .top-checkbox {
             display: flex;
@@ -26,7 +27,26 @@
 
         .top-range {
             padding: 0 0 1%;
+            height: auto;
+            max-height: 200px;
+            overflow: hidden;
+            opacity: 1;
+            transition:
+                max-height 0.3s ease,
+                opacity 0.3s ease,
+                padding 0.3s ease;
         }
+
+        .top-range.hidden {
+            max-height: 0;
+            padding: 0;
+            opacity: 0;
+            pointer-events: none;
+        }
+    }
+
+    .top.hidden {
+        gap: 0;
     }
 
     .top-right-checkbox,
@@ -134,10 +154,13 @@
             display: flex;
             flex-direction: column;
             place-items: center;
-            gap: 1em;
             border-bottom: 0.15em solid var(--accent-bg);
-            height: 234px;
+            height: 250px;
             overflow-y: auto;
+
+            svg {
+                width: 60%;
+            }
 
             .center-bottom-p {
                 margin: 28% 0;
@@ -149,7 +172,7 @@
                 align-items: center;
                 gap: 1em;
                 border-bottom: 0.15em solid var(--accent-bg);
-                padding: 3% var(--content-gutter);
+                padding: 1.5% var(--content-gutter);
                 width: 100%;
 
                 &.playing {
@@ -175,6 +198,22 @@
                         text-align: left;
                         width: 100%;
                     }
+
+                    .center-bottom-tabs-center-bottom {
+                        /* overflow: hidden; */
+                        max-height: 200px;
+                        opacity: 1;
+                        transition:
+                            max-height 0.3s ease,
+                            opacity 0.3s ease,
+                            padding 0.3s ease;
+                    }
+
+                    .center-bottom-tabs-center-bottom.hidden {
+                        max-height: 0;
+                        opacity: 0;
+                        pointer-events: none;
+                    }
                 }
 
                 .center-bottom-tabs-right {
@@ -183,6 +222,21 @@
                     justify-content: space-between;
                     align-items: center;
                     gap: 1em;
+                    min-width: 30px;
+
+                    .pin-icon {
+                        font-size: 1rem;
+                        cursor: pointer;
+                        opacity: 0.5;
+                        transition:
+                            opacity 0.2s ease,
+                            color 0.2s ease;
+                    }
+
+                    .pin-icon.pinned {
+                        opacity: 1;
+                        color: var(--accent);
+                    }
                 }
             }
         }

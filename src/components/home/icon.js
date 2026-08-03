@@ -1,6 +1,6 @@
 import styles from './component.module.css'
 
-export default function IconContainer({ icon, color = '#125678', label = '' }) {
+export default function IconContainer({ icon, color = 'transparent', label = '' }) {
     const isImage =
         typeof icon === 'string' && (icon.startsWith('http') || icon.startsWith('data:'))
     const iconMarkup = isImage

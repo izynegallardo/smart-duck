@@ -9,17 +9,29 @@ export default defineContentScript({
     async main() {
         let settings = await getSettings()
         let isPrimary = (await sendMessage(MSG.GET_PRIMARY)).isPrimary
-
         let isDucked = false
+        let {
+            muted: isMuted,
+            pinned: isPinned,
+            volume: tabVolume,
+        } = await sendMessage(MSG.GET_TAB_OVERRIDE)
 
         function applyDuckState() {
             let mediaElements = findMediaElements()
-
             isDucked = settings.autoDuckEnabled && !isPrimary
+            const targetDuckLevel = isMuted
+                ? 0
+                : settings.autoDuckEnabled
+                  ? isDucked
+                      ? settings.duckLevel
+                      : null
+                  : tabVolume != null
+                    ? tabVolume
+                    : null
 
             mediaElements.forEach((element) => {
-                if (isDucked) {
-                    duck(element, settings.duckLevel)
+                if (targetDuckLevel !== null) {
+                    duck(element, targetDuckLevel)
                 } else {
                     unduck(element)
                 }
@@ -27,7 +39,10 @@ export default defineContentScript({
 
             sendMessage(MSG.MEDIA_STATE_CHANGED, {
                 ducked: isDucked,
+                muted: isMuted,
+                pinned: isPinned,
                 elements: mediaElements.map(describeMedia),
+                volume: tabVolume,
                 url: location.href,
             })
         }
@@ -48,12 +63,19 @@ export default defineContentScript({
             if (message.type === MSG.GET_STATE) {
                 sendResponse({
                     ducked: isDucked,
+                    muted: isMuted,
                     elements: findMediaElements().map(describeMedia),
+                    volume: tabVolume,
                 })
             }
 
             if (message.type === MSG.PRIMARY_CHANGED) {
                 isPrimary = message.payload.isPrimary
+                applyDuckState()
+            }
+            if (message.type === MSG.TAB_OVERRIDE_CHANGED) {
+                isMuted = message.payload.muted
+                tabVolume = message.payload.volume
                 applyDuckState()
             }
         })

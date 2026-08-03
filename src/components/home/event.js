@@ -4,24 +4,83 @@ import toggleTheme from '@/utils/toggleTheme'
 import rate from '@/utils/rate'
 import { MSG, sendMessage } from '@/core/messaging'
 import { getSettings, updateSettings } from '@/core/storage'
+import { updateIcons } from '@/helpers/lucide'
 
 export default function Event() {
     try {
         const centerButtom = document.getElementById('center-bottom')
         const range = document.getElementById('range')
+        let autoDuckEnabled = true
+        let lastTabs = []
+
+        // mute
+        centerButtom.addEventListener('click', (event) => {
+            const target = event.target.closest('[data-tab-mute-id]')
+
+            if (!target) return
+
+            const tabId = Number(target.dataset.tabMuteId)
+            const isMuted = target.dataset.muted === 'true'
+            sendMessage(MSG.SET_TAB_OVERRIDE, { tabId, patch: { muted: !isMuted } })
+        })
+
+        // pin
+        centerButtom.addEventListener('click', (event) => {
+            const target = event.target.closest('[data-tab-pin-id]')
+            if (!target) return
+
+            const tabId = Number(target.dataset.tabPinId)
+            const isPinned = target.dataset.pinned === 'true'
+
+            sendMessage(MSG.SET_TAB_OVERRIDE, { tabId, patch: { pinned: !isPinned } })
+        })
+
+        // tab volume slider UI
+        centerButtom.addEventListener('input', (event) => {
+            if (event.target.type !== 'range') return
+
+            const target = event.target.closest(`.${styles['center-bottom-tabs']}`)
+            const rightSection = target.querySelector(`.${styles['center-bottom-tabs-right']}`)
+            const volumeSpan = rightSection?.querySelector('span')
+
+            if (volumeSpan) {
+                volumeSpan.textContent = `${event.target.value}%`
+            }
+        })
+
+        // tab volume slider messanger
+        centerButtom.addEventListener('change', (event) => {
+            if (event.target.type !== 'range') return
+
+            const tabId = Number(event.target.id)
+            sendMessage(MSG.SET_TAB_OVERRIDE, {
+                tabId,
+                patch: { volume: Number(event.target.value) },
+            })
+        })
 
         function handleAutoDuck(settings) {
+            const topSection = document.getElementById('top')
             const checkboxDuck = document.getElementById('checkbox-duck')
+            const checkboxLabel = document.getElementById('checkbox-switch')
+            const topRangeDiv = document.getElementById('top-range')
+
             checkboxDuck.checked = settings.autoDuckEnabled
+            autoDuckEnabled = settings.autoDuckEnabled
+
+            renderActiveTabs(lastTabs)
 
             function updateUI() {
-                if (checkboxDuck.checked) {
-                    console.log('Auto Ducking Enabled')
-                    centerButtom.style.opacity = '0.4'
-                } else {
-                    console.log('Auto Ducking Disabled')
-                    centerButtom.style.opacity = '1'
-                }
+                const hiddenClassName = styles['hidden'] || 'hidden'
+                topSection.classList.toggle(hiddenClassName, !checkboxDuck.checked)
+                topRangeDiv.classList.toggle(hiddenClassName, !checkboxDuck.checked)
+                autoDuckEnabled = checkboxDuck.checked
+
+                checkboxLabel.title = autoDuckEnabled
+                    ? 'Disable automatic ducking'
+                    : 'Enable automatic ducking'
+
+                renderActiveTabs(lastTabs)
             }
 
             updateUI()
@@ -29,6 +88,8 @@ export default function Event() {
             checkboxDuck.addEventListener('change', () => {
                 updateUI()
                 updateSettings({ autoDuckEnabled: checkboxDuck.checked })
+                autoDuckEnabled = checkboxDuck.checked
+                renderActiveTabs(lastTabs)
             })
         }
 
@@ -69,9 +130,16 @@ export default function Event() {
         }
 
         function renderActiveTabs(tabs) {
+            lastTabs = tabs
+
+            const sortedTabs = [...tabs].sort((a, b) => {
+                if (a.pinned === b.pinned) return 0
+                return a.pinned ? -1 : 1
+            })
+
             let container = ''
 
-            tabs.map((tab) => {
+            sortedTabs.forEach((tab) => {
                 let waveBars = ''
 
                 if (tab.status === 'playing') {
@@ -89,37 +157,50 @@ export default function Event() {
 
                 container += `
                         <div class="${styles['center-bottom-tabs']} ${tab.status === 'playing' ? styles.playing : ''}">
-                        <section class='${styles['center-bottom-tabs-left']}'>
-                            ${IconContainer({
-                                icon: tab.icon,
-                                label: `${tab.name} icon`,
-                            })}
-                        </section>
-                        
-                        <section class='${styles['center-bottom-tabs-center']}'>
-                            <div class='${styles['center-bottom-tabs-center-top']}'>
-                                <div style='width:80%'>
-                                    <label for='${tab.id}'>${tab.name}</label>
-                                    <p style='opacity: 0.8'>${tab.domain}</p>
+                            <section class='${styles['center-bottom-tabs-left']}'>
+                                ${IconContainer({
+                                    icon: tab.icon,
+                                    label: `${tab.name} icon`,
+                                })}
+                            </section>
+                            
+                            <section id='center-bottom-tabs-center' class='${styles['center-bottom-tabs-center']} ${autoDuckEnabled ? styles['hidden'] : ''}'>
+                                <div class='${styles['center-bottom-tabs-center-top']}'>
+                                    <div style='width:80%'>
+                                        <label for='${tab.id}'>${tab.name}</label>
+                                        <p style='opacity: 0.8'>${tab.domain}</p>
+                                    </div>
+                                    ${waveBars}
                                 </div>
-                                ${waveBars}
-                            </div>
-                            <div class='${styles['center-bottom-tabs-center-bottom']}'>
-                                <input id='${tab.id}' type="range" min="0" max="100" value="20">
-                            </div>
-                        </section>
-                        
-                        <section class='${styles['center-bottom-tabs-right']}'>
-                                <i class="fa-solid fa-volume"></i>
-                                <span>20%</span>
-                        </section>
-                    </div>
-                `
+                                <div class='${styles['center-bottom-tabs-center-bottom']} ${autoDuckEnabled ? styles['hidden'] : ''}'>
+                                    <input id='${tab.id}' type="range" min="0" max="100" value='${tab.volume ?? 100}' ${autoDuckEnabled ? 'disabled' : ''}>
+                                </div>
+                            </section>
+                            
+                            <section class='${styles['center-bottom-tabs-right']}'>
+                                    <i
+                                        class='bi ${styles['pin-icon']} ${tab.pinned ? `bi-pin-angle-fill ${styles['pinned']}` : 'bi-pin-angle'}'
+                                        data-tab-pin-id='${tab.id}'
+                                        data-pinned='${tab.pinned}'
+                                        title='${tab.pinned ? 'Unpin' : 'Pin'} ${tab.name}'
+                                    ></i>
+                                    <i
+                                        data-lucide='${tab.muted ? 'volume-x' : 'volume-2'}'
+                                        data-tab-mute-id='${tab.id}'
+                                        data-muted='${tab.muted}'
+                                        title='${tab.muted ? 'Unmute' : 'Mute'} ${tab.name}'
+                                    ></i>
+                                    <span class='${styles['center-bottom-tabs-right-span']}' style='${autoDuckEnabled ? 'display: none' : ''}'>${tab.volume ?? 100}%</span>
+                            </section>
+                        </div>
+                    `
             })
 
             centerButtom.innerHTML = tabs.length
                 ? container
                 : `<p class='${styles['center-bottom-p']}'>No active tabs</p>`
+
+            updateIcons(centerButtom)
         }
 
         function renderSummary(summary) {
@@ -141,10 +222,8 @@ export default function Event() {
 
             function updateUI() {
                 if (checkboxDetection.checked) {
-                    console.log('Voice Detection Enabled')
                     bottomLeft.style.opacity = '1'
                 } else {
-                    console.log('Voice Detection Disabled')
                     bottomLeft.style.opacity = '0.4'
                 }
             }
@@ -157,7 +236,6 @@ export default function Event() {
         toggleTheme()
         rate()
         handleVoiceDetection()
-
         getSettings().then((settings) => {
             handleAutoDuck(settings)
             handleDuckLevel(settings)

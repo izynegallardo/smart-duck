@@ -1,8 +1,9 @@
+import { browser } from 'wxt/browser'
 import { MSG, sendMessage, sendTabMessage } from '@/core/messaging'
 import truncate from '@/utils/truncate'
-import { browser } from 'wxt/browser'
 
 const tabState = new Map()
+const tabOverrides = new Map()
 let focusedWindowId = null
 let primaryTabId = null
 
@@ -13,17 +14,17 @@ function computeSummary() {
         tabs: tabState.size,
         playing: states.filter((state) => state.elements.some((element) => element.playing)).length,
         ducked: states.filter((state) => state.ducked).length,
-
         list: [...tabState.entries()].map(([id, state]) => ({
             id,
             icon: state.favIconUrl,
             name: truncate(state.title, 50),
             domain: new URL(state.url).hostname,
-            status: state.ducked
-                ? 'ducked'
-                : state.elements.some((element) => element.playing)
-                  ? 'playing'
-                  : 'stopped',
+            url: state.url,
+            status: state.elements.some((element) => element.playing) ? 'playing' : 'stopped',
+            ducked: state.ducked,
+            muted: state.muted,
+            volume: state.volume,
+            pinned: tabOverrides.get(id)?.pinned ?? false,
         })),
     }
 }
@@ -61,10 +62,27 @@ export default defineBackground(() => {
                 isPrimary: sender.tab?.id === primaryTabId,
             })
         }
+
+        if (message.type === MSG.GET_TAB_OVERRIDE) {
+            sendResponse(tabOverrides.get(sender.tab?.id) ?? { muted: false })
+        }
+
+        if (message.type === MSG.SET_TAB_OVERRIDE) {
+            const { tabId, patch } = message.payload
+            const current = tabOverrides.get(tabId) ?? {}
+            const next = { ...current, ...patch }
+
+            tabOverrides.set(tabId, next)
+
+            sendTabMessage(tabId, MSG.TAB_OVERRIDE_CHANGED, next).catch(() => {})
+
+            broadcastSummary()
+        }
     })
 
     browser.tabs.onRemoved.addListener((tabId, removeInfo) => {
         tabState.delete(tabId)
+        tabOverrides.delete(tabId)
         console.log('remove', tabState)
 
         broadcastSummary()

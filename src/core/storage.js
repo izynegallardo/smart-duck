@@ -4,6 +4,7 @@ const DEFAULT_SETTINGS = {
     duckLevel: 20,
     autoDuckEnabled: true,
     voiceDetectionEnabled: false,
+    theme: 'system',
 }
 
 export const settingsStorage = storage.defineItem('local:settings', {
