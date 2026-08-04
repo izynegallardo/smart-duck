@@ -2,6 +2,10 @@ export function toVolumeMultiplier(duckLevel) {
     return Math.min(1, Math.max(0, duckLevel / 100))
 }
 
+export function toBackgroundVolume(currentValue, useOppositeSemantics) {
+    return useOppositeSemantics ? 100 - currentValue : currentValue
+}
+
 export function findMediaElements(root = document) {
     return [...root.querySelectorAll('audio, video')]
 }

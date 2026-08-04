@@ -2,9 +2,6 @@ import { getSettings, updateSettings } from '@/core/storage'
 
 export default async function toggleTheme() {
     const themeModeRadioBtns = document.querySelectorAll('input[name="themeMode"]')
-
-    if (!themeModeRadioBtns.length) return
-
     const mediaQueryList = window.matchMedia('(prefers-color-scheme: dark)')
 
     function applyTheme(isDark) {

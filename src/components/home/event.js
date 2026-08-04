@@ -2,6 +2,7 @@ import styles from './component.module.css'
 import IconContainer from './icon'
 import toggleTheme from '@/utils/toggleTheme'
 import rate from '@/utils/rate'
+import hideRatingsSection from '@/utils/hideRatings'
 import { MSG, sendMessage } from '@/core/messaging'
 import { getSettings, updateSettings } from '@/core/storage'
 import { updateIcons } from '@/helpers/lucide'
@@ -9,7 +10,7 @@ import { updateIcons } from '@/helpers/lucide'
 export default function Event() {
     try {
         const centerButtom = document.getElementById('center-bottom')
-        const range = document.getElementById('range')
+        const topRangeEl = document.getElementById('top-range')
         let autoDuckEnabled = true
         let lastTabs = []
 
@@ -59,11 +60,12 @@ export default function Event() {
             })
         })
 
+        // auto duck
         function handleAutoDuck(settings) {
             const topSection = document.getElementById('top')
             const checkboxDuck = document.getElementById('checkbox-duck')
             const checkboxLabel = document.getElementById('checkbox-switch')
-            const topRangeDiv = document.getElementById('top-range')
+            const topRangeDiv = document.getElementById('top-div-range')
 
             checkboxDuck.checked = settings.autoDuckEnabled
             autoDuckEnabled = settings.autoDuckEnabled
@@ -93,42 +95,47 @@ export default function Event() {
             })
         }
 
-        function updateRange() {
-            const value = range.value
-            const max = range.max
-            const percent = (value / max) * 100
-
-            range.style.background = `linear-gradient(to right,
-                #5b6dff 0%,
-                #5b6dff ${percent}%,
-                #555 ${percent}%,
-                #555 100%)`
-        }
-
-        range.addEventListener('input', updateRange)
-
+        // top range
         function handleDuckLevel(settings) {
-            const value = document.getElementById('value')
-            range.value = settings.duckLevel
+            const topRangeSpan = document.getElementById('top-range-span')
+            const topRangeLabel = document.getElementById('top-range-label')
+
+            topRangeEl.value = settings.duckLevel
+
+            if (settings.useOppositeSematics) topRangeLabel.textContent = 'Duck Strength'
+
+            function updateRange() {
+                const value = topRangeEl.value
+                const max = topRangeEl.max || 100
+                const percent = (value / max) * 100
+
+                topRangeEl.style.background = `linear-gradient(to right,
+                    #5b6dff 0%,
+                    #5b6dff ${percent}%,
+                    #555 ${percent}%,
+                    #555 100%)
+                `
+
+                topRangeSpan.textContent = `${value}%`
+            }
 
             updateRange()
-            value.textContent = `${range.value}%`
 
-            range.addEventListener('input', () => {
-                value.textContent = `${range.value}%`
-            })
+            topRangeEl.addEventListener('input', updateRange)
 
-            range.addEventListener('change', () => {
-                updateSettings({ duckLevel: Number(range.value) })
+            topRangeEl.addEventListener('change', () => {
+                updateSettings({ duckLevel: Number(topRangeEl.value) })
             })
         }
 
+        // top stats
         function renderStats(summary) {
             document.getElementById('stat-tabs').textContent = summary.tabs
             document.getElementById('stat-playing').textContent = summary.playing
             document.getElementById('stat-ducked').textContent = summary.ducked
         }
 
+        // tabs section
         function renderActiveTabs(tabs) {
             lastTabs = tabs
 
@@ -239,6 +246,7 @@ export default function Event() {
         getSettings().then((settings) => {
             handleAutoDuck(settings)
             handleDuckLevel(settings)
+            hideRatingsSection(settings.hideRatingsEnabled)
         })
     } catch (error) {
         console.log('Home Event:', error)

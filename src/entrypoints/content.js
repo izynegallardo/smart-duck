@@ -1,5 +1,5 @@
 import { browser } from 'wxt/browser'
-import { findMediaElements, duck, unduck, describeMedia } from '@/core/ducking'
+import { findMediaElements, duck, unduck, describeMedia, toBackgroundVolume } from '@/core/ducking'
 import { getSettings, watchSettings } from '@/core/storage'
 import { MSG, sendMessage } from '@/core/messaging'
 import debounce from '@/utils/debounce'
@@ -19,7 +19,8 @@ export default defineContentScript({
         function applyDuckState() {
             let mediaElements = findMediaElements()
             isDucked = settings.autoDuckEnabled && !isPrimary
-            const targetDuckLevel = isMuted
+
+            const rawLevel = isMuted
                 ? 0
                 : settings.autoDuckEnabled
                   ? isDucked
@@ -28,6 +29,11 @@ export default defineContentScript({
                   : tabVolume != null
                     ? tabVolume
                     : null
+
+            const targetDuckLevel =
+                !isMuted && rawLevel !== null
+                    ? toBackgroundVolume(rawLevel, settings.useOppositeSematics)
+                    : rawLevel
 
             mediaElements.forEach((element) => {
                 if (targetDuckLevel !== null) {

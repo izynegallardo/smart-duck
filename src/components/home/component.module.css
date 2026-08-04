@@ -25,7 +25,7 @@
             }
         }
 
-        .top-range {
+        .top-div-range {
             padding: 0 0 1%;
             height: auto;
             max-height: 200px;
@@ -37,7 +37,7 @@
                 padding 0.3s ease;
         }
 
-        .top-range.hidden {
+        .top-div-range.hidden {
             max-height: 0;
             padding: 0;
             opacity: 0;
@@ -85,7 +85,7 @@
         top: 3px;
         background: white;
         border-radius: 50%;
-        box-shadow: 1px 1px 10px black;
+        box-shadow: 1px 1px 5px black;
         transition: 0.2s;
     }
 

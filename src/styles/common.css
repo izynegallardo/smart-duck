@@ -7,8 +7,6 @@
     font-weight: 400;
 
     color-scheme: light dark;
-    color: rgba(255, 255, 255, 0.87);
-    background-color: var(--accent-bg);
 
     font-synthesis: none;
     text-rendering: optimizeLegibility;
@@ -28,9 +26,17 @@
     --shadow: rgba(0, 0, 0, 0.1) 0 10px 15px -3px, rgba(0, 0, 0, 0.05) 0 4px 6px -2px;
     --content-gutter: 5%;
 
+    --fg: var(--text-h);
+    --surface: var(--bg);
+
     --sans: system-ui, 'Segoe UI', Inter, Roboto, Avenir, Helvetica, Arial, sans-serif;
     --heading: system-ui, 'Segoe UI', Roboto, sans-serif;
     --mono: ui-monospace, Consolas, monospace;
+}
+
+body.dark {
+    --surface: var(--accent-bg);
+    --fg: rgba(255, 255, 255, 0.87);
 }
 
 *,
@@ -52,6 +58,8 @@ body {
     margin: 0;
     min-width: 380px;
     /* min-height: 100vh; */
+    background-color: var(--surface);
+    color: var(--fg);
 }
 
 h1 {
@@ -123,7 +131,8 @@ button:focus-visible {
     outline: 4px auto -webkit-focus-ring-color;
 }
 
-@media (prefers-color-scheme: light) {
+/* 
+@media (prefers-color-scheme: dark) {
     :root {
         color: #213547;
         background-color: #ffffff;
@@ -134,4 +143,4 @@ button:focus-visible {
     button {
         background-color: #f9f9f9;
     }
-}
+} */

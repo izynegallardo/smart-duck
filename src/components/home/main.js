@@ -16,12 +16,12 @@ export default function Main(root) {
                     </label>    
                 </div>
             </div>    
-            <div id='top-range' class='${styles['top-range']}'>
+            <div id='top-div-range' class='${styles['top-div-range']}'>
                 <div class='${styles['top-range-left']}'>
-                    <label for='range'>Background Volume</label>
-                    <span id="value">20%</span>
+                    <label id='top-range-label' for='range'>Background Volume</label>
+                    <span id="top-range-span">20%</span>
                 </div>
-                <input id='range' type="range" min="0" max="100" value="20">
+                <input id='top-range' type="range" min="0" max="100" value="20">
             </div>
         </section>
         

@@ -2,9 +2,12 @@ import { storage } from '@wxt-dev/storage'
 
 const DEFAULT_SETTINGS = {
     duckLevel: 20,
+    fadeDuration: 0,
     autoDuckEnabled: true,
     voiceDetectionEnabled: false,
     theme: 'system',
+    hideRatingsEnabled: false,
+    useOppositeSematics: false,
 }
 
 export const settingsStorage = storage.defineItem('local:settings', {

@@ -9,6 +9,10 @@
     text-align: left;
     background-color: var(--accent-bg);
 
+    .hidden {
+        display: none;
+    }
+
     .top {
         margin: 0 auto;
     }

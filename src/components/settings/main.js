@@ -21,16 +21,12 @@ export default function Main(root) {
                         <span>Dark</span>
                     </label>
                 </div>
-                <div class='${styles['top-div-group']}' role='group' aria-describedby='color-picker-desc'>
-                    <span id='color-picker-desc' class='${styles['hidden']}'>Choose a color theme for the page</span>
-                    <label class='${styles['top-div-color-label']}'>Color Theme: </label>
-                </div>
                 <div class='${styles['top-div-group']}' role='group' aria-describedby='ratings-toggle-desc'>
                     <span id='ratings-toggle-desc' class='${styles['hidden']}'>Show or hide the ratings section on the home page</span>
-                    <label for='toggle-ratings' class='${styles['top-div-rating-label']}'>Hide ratings section: </label>
+                    <label for='checkbox-ratings' class='${styles['top-div-rating-label']}'>Hide ratings section: </label>
                     <div class='${styles['checkbox-container']}'>
                         <label class='${styles['checkbox-switch']}'>
-                            <input id='toggle-ratings' type='checkbox' />
+                            <input id='checkbox-ratings' type='checkbox'/>
                             <span class='${styles['checkbox-slider']}'></span>
                         </label>
                     </div>
@@ -43,10 +39,10 @@ export default function Main(root) {
             <div class='${styles['section-container']}'>
                 <div class='${styles['center-div-group']}' role='group' aria-describedby='semantics-toggle-desc'>
                     <span id='semantics-toggle-desc' class='${styles['hidden']}'>Use Duck Level (duck strength) instead of Background Volume. Using opposite semantics</span>
-                    <label for='toggle-semantics' class='${styles['center-div-sematics-label']}'>Use opposite semantics:</label>
+                    <label for='checkbox-semantics' class='${styles['center-div-sematics-label']}'>Use opposite semantics:</label>
                     <div class='${styles['checkbox-container']}'>
                         <label class='${styles['checkbox-switch']}'>
-                            <input id='toggle-semantics' type='checkbox' />
+                            <input id='checkbox-semantics' type='checkbox'/>
                             <span class='${styles['checkbox-slider']}'></span>
                         </label>
                     </div>

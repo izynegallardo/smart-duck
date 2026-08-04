@@ -16,9 +16,7 @@
         .left-a {
             display: inline-flex;
             align-items: center;
-            justify-content: center;
             flex: 0 0 2.5rem;
-            width: 2.5rem;
             height: 2.5rem;
             padding: 0;
 

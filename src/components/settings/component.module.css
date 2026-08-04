@@ -7,14 +7,14 @@
     flex: 1;
     text-align: left;
 
-    h1 {
-        font-size: 1.5rem;
-        margin-bottom: 1rem;
+    h1,
+    p,
+    label {
+        font-size: 1rem;
     }
 
-    p {
-        font-size: 1rem;
-        font-weight: normal;
+    h1 {
+        margin-bottom: 1rem;
     }
 
     ul {
@@ -73,7 +73,7 @@
         top: 3px;
         background: white;
         border-radius: 50%;
-        box-shadow: 1px 1px 10px black;
+        box-shadow: 1px 1px 5px black;
         transition: 0.2s;
     }
 
@@ -110,7 +110,6 @@
     .center-div-sematics-label,
     .center-div-fade-label {
         margin: 0;
-        font-size: 1rem;
         font-weight: normal;
     }
 
