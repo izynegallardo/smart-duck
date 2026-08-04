@@ -12,7 +12,7 @@ export default function Main(root) {
                 <div class='${styles['top-right-checkbox']}'>
                     <label id='checkbox-switch' class='${styles['checkbox-switch']}'>
                         <input id='checkbox-duck' type="checkbox" checked>
-                            <span class='${styles['checkbox-slider']}'></span>
+                        <span class='${styles['checkbox-slider']}'></span>
                     </label>    
                 </div>
             </div>    
@@ -54,8 +54,7 @@ export default function Main(root) {
             <div class='${styles['bottom-right-checkbox']}'>
                 <label class='${styles['checkbox-switch']}'>
                     <input id='checkbox-detection' type="checkbox">
-                        <span class='${styles['checkbox-slider']}'></span>
-                    </div>
+                    <span class='${styles['checkbox-slider']}'></span>
                 </label> 
             </div>
         </section>

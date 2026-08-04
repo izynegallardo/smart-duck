@@ -50,9 +50,6 @@ export default function Header(
         </section>
 
         <section class='${styles['right']}'>
-            <button id='theme-toggle' class='${styles['right-button']}' aria-label='Toggle theme'>
-                <i class='fa-solid fa-moon' style='color: rgb(255, 212, 59);'></i>
-            </button>
             ${settingsLink}
         </section>
     `

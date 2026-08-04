@@ -1,47 +1,45 @@
-import { updateIcons } from '@/helpers/lucide'
 import { getSettings, updateSettings } from '@/core/storage'
 
 export default async function toggleTheme() {
-    const themeButton = document.getElementById('theme-toggle')
+    const themeModeRadioBtns = document.querySelectorAll('input[name="themeMode"]')
 
-    if (!themeButton) return
+    if (!themeModeRadioBtns.length) return
 
-    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
+    const mediaQueryList = window.matchMedia('(prefers-color-scheme: dark)')
 
     function applyTheme(isDark) {
         document.body.classList.toggle('dark', isDark)
-
-        themeButton.innerHTML = isDark
-            ? `<i data-lucide="sun"></i>`
-            : `<i class="fa-solid fa-moon" style="color: rgb(255, 212, 59);"></i>`
-
-        updateIcons(themeButton)
     }
 
-    applyTheme(mediaQuery.matches)
+    function determineThemeState(themeMode) {
+        if (themeMode === 'system') {
+            return mediaQueryList.matches
+        }
+        return themeMode === 'dark'
+    }
 
     const settings = await getSettings()
     let currentTheme = settings.theme ?? 'system'
 
-    if (currentTheme === 'system') {
-        applyTheme(mediaQuery.matches)
-    } else if (currentTheme === 'dark') {
-        applyTheme(true)
-    } else {
-        applyTheme(false)
-    }
+    applyTheme(determineThemeState(currentTheme))
 
-    themeButton.addEventListener('click', async () => {
-        const isDark = !document.body.classList.contains('dark')
+    themeModeRadioBtns.forEach((radio) => {
+        radio.checked = radio.value === currentTheme
 
-        applyTheme(isDark)
+        radio.addEventListener('change', async (event) => {
+            if (event.target.checked) {
+                const selectedValue = event.target.value
+                currentTheme = selectedValue
 
-        currentTheme = isDark ? 'dark' : 'light'
+                const targetIsDark = determineThemeState(selectedValue)
+                applyTheme(targetIsDark)
 
-        await updateSettings({ theme: currentTheme })
+                await updateSettings({ theme: selectedValue })
+            }
+        })
     })
 
-    mediaQuery.addEventListener('change', (e) => {
-        if (currentTheme === 'system') applyTheme(e.matches)
+    mediaQueryList.addEventListener('change', (event) => {
+        if (currentTheme === 'system') applyTheme(event.matches)
     })
 }
