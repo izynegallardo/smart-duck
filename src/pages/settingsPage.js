@@ -11,5 +11,5 @@ export default function SettingsPage() {
     Main(main)
     Footer(footer)
 
-    Events()
+    return Events()
 }

@@ -2,20 +2,33 @@ import styles from './component.module.css'
 import IconContainer from './icon'
 import toggleTheme from '@/utils/toggleTheme'
 import rate from '@/utils/rate'
-import hideRatingsSection from '@/utils/hideRatings'
+import hideRatingsSectionUI from '@/utils/hideRatings'
 import { MSG, sendMessage } from '@/core/messaging'
-import { getSettings, updateSettings } from '@/core/storage'
+import { getSettings, updateSettings, watchSettings } from '@/core/storage'
 import { updateIcons } from '@/helpers/lucide'
 
 export default function Event() {
     try {
+        const checkboxDuck = document.getElementById('checkbox-duck')
         const centerButtom = document.getElementById('center-bottom')
         const topRangeEl = document.getElementById('top-range')
         let autoDuckEnabled = true
         let lastTabs = []
+        const cleanupFns = []
+
+        function registerCleanup(cleanup) {
+            cleanupFns.push(cleanup)
+        }
+
+        function addEventListenerWithCleanup(target, eventName, handler) {
+            target?.addEventListener(eventName, handler)
+            registerCleanup(() => {
+                target?.removeEventListener(eventName, handler)
+            })
+        }
 
         // mute
-        centerButtom.addEventListener('click', (event) => {
+        const onMuteClick = (event) => {
             const target = event.target.closest('[data-tab-mute-id]')
 
             if (!target) return
@@ -23,10 +36,11 @@ export default function Event() {
             const tabId = Number(target.dataset.tabMuteId)
             const isMuted = target.dataset.muted === 'true'
             sendMessage(MSG.SET_TAB_OVERRIDE, { tabId, patch: { muted: !isMuted } })
-        })
+        }
+        addEventListenerWithCleanup(centerButtom, 'click', onMuteClick)
 
         // pin
-        centerButtom.addEventListener('click', (event) => {
+        const onPinClick = (event) => {
             const target = event.target.closest('[data-tab-pin-id]')
             if (!target) return
 
@@ -34,10 +48,11 @@ export default function Event() {
             const isPinned = target.dataset.pinned === 'true'
 
             sendMessage(MSG.SET_TAB_OVERRIDE, { tabId, patch: { pinned: !isPinned } })
-        })
+        }
+        addEventListenerWithCleanup(centerButtom, 'click', onPinClick)
 
         // tab volume slider UI
-        centerButtom.addEventListener('input', (event) => {
+        const onVolumeInput = (event) => {
             if (event.target.type !== 'range') return
 
             const target = event.target.closest(`.${styles['center-bottom-tabs']}`)
@@ -47,10 +62,11 @@ export default function Event() {
             if (volumeSpan) {
                 volumeSpan.textContent = `${event.target.value}%`
             }
-        })
+        }
+        addEventListenerWithCleanup(centerButtom, 'input', onVolumeInput)
 
         // tab volume slider messanger
-        centerButtom.addEventListener('change', (event) => {
+        const onVolumeChange = (event) => {
             if (event.target.type !== 'range') return
 
             const tabId = Number(event.target.id)
@@ -58,75 +74,66 @@ export default function Event() {
                 tabId,
                 patch: { volume: Number(event.target.value) },
             })
-        })
+        }
+        addEventListenerWithCleanup(centerButtom, 'change', onVolumeChange)
 
         // auto duck
-        function handleAutoDuck(settings) {
+        function handleAutoDuckUI(settings) {
             const topSection = document.getElementById('top')
-            const checkboxDuck = document.getElementById('checkbox-duck')
             const checkboxLabel = document.getElementById('checkbox-switch')
             const topRangeDiv = document.getElementById('top-div-range')
+            const hiddenClassName = styles['hidden'] || 'hidden'
 
             checkboxDuck.checked = settings.autoDuckEnabled
             autoDuckEnabled = settings.autoDuckEnabled
 
+            topSection.classList.toggle(hiddenClassName, !autoDuckEnabled)
+            topRangeDiv.classList.toggle(hiddenClassName, !autoDuckEnabled)
+
+            checkboxLabel.title = autoDuckEnabled
+                ? 'Disable automatic ducking'
+                : 'Enable automatic ducking'
+
             renderActiveTabs(lastTabs)
-
-            function updateUI() {
-                const hiddenClassName = styles['hidden'] || 'hidden'
-                topSection.classList.toggle(hiddenClassName, !checkboxDuck.checked)
-                topRangeDiv.classList.toggle(hiddenClassName, !checkboxDuck.checked)
-                autoDuckEnabled = checkboxDuck.checked
-
-                checkboxLabel.title = autoDuckEnabled
-                    ? 'Disable automatic ducking'
-                    : 'Enable automatic ducking'
-
-                renderActiveTabs(lastTabs)
-            }
-
-            updateUI()
-
-            checkboxDuck.addEventListener('change', () => {
-                updateUI()
-                updateSettings({ autoDuckEnabled: checkboxDuck.checked })
-                autoDuckEnabled = checkboxDuck.checked
-                renderActiveTabs(lastTabs)
-            })
         }
 
+        const onAutoDuckChange = () => {
+            updateSettings({ autoDuckEnabled: checkboxDuck.checked })
+        }
+        addEventListenerWithCleanup(checkboxDuck, 'change', onAutoDuckChange)
+
         // top range
-        function handleDuckLevel(settings) {
-            const topRangeSpan = document.getElementById('top-range-span')
+        function handleDuckLevelRangeUI(settings) {
             const topRangeLabel = document.getElementById('top-range-label')
 
             topRangeEl.value = settings.duckLevel
+            topRangeLabel.textContent = settings.useOppositeSematics
+                ? 'Duck Strength'
+                : 'Background Volume'
 
-            if (settings.useOppositeSematics) topRangeLabel.textContent = 'Duck Strength'
-
-            function updateRange() {
-                const value = topRangeEl.value
-                const max = topRangeEl.max || 100
-                const percent = (value / max) * 100
-
-                topRangeEl.style.background = `linear-gradient(to right,
-                    #5b6dff 0%,
-                    #5b6dff ${percent}%,
-                    #555 ${percent}%,
-                    #555 100%)
-                `
-
-                topRangeSpan.textContent = `${value}%`
-            }
-
-            updateRange()
-
-            topRangeEl.addEventListener('input', updateRange)
-
-            topRangeEl.addEventListener('change', () => {
-                updateSettings({ duckLevel: Number(topRangeEl.value) })
-            })
+            updateRangeGradient()
         }
+
+        function updateRangeGradient() {
+            const topRangeSpan = document.getElementById('top-range-span')
+            const value = topRangeEl.value
+            const max = topRangeEl.max || 100
+            const percent = (value / max) * 100
+
+            topRangeEl.style.background = `linear-gradient(to right,
+                #5b6dff 0%,
+                #5b6dff ${percent}%,
+                #555 ${percent}%,
+                #555 100%)
+            `
+            topRangeSpan.textContent = `${value}%`
+        }
+
+        addEventListenerWithCleanup(topRangeEl, 'input', updateRangeGradient)
+        const onDuckLevelChange = () => {
+            updateSettings({ duckLevel: Number(topRangeEl.value) })
+        }
+        addEventListenerWithCleanup(topRangeEl, 'change', onDuckLevelChange)
 
         // top stats
         function renderStats(summary) {
@@ -217,37 +224,57 @@ export default function Event() {
 
         sendMessage(MSG.GET_SUMMARY).then(renderSummary)
 
-        browser.runtime.onMessage.addListener((message) => {
+        function onSummaryChanged(message) {
             if (message.type === MSG.SUMMARY_CHANGED) {
                 renderSummary(message.payload)
             }
-        })
+        }
 
-        function handleVoiceDetection() {
+        browser.runtime.onMessage.addListener(onSummaryChanged)
+
+        let onVoiceDetectionChange = null
+
+        function handleVoiceDetectionUI(settings) {
             const checkboxDetection = document.getElementById('checkbox-detection')
             const bottomLeft = document.getElementById('bottom-left')
 
-            function updateUI() {
-                if (checkboxDetection.checked) {
-                    bottomLeft.style.opacity = '1'
-                } else {
-                    bottomLeft.style.opacity = '0.4'
+            if (!checkboxDetection || !bottomLeft) return
+
+            checkboxDetection.checked = settings.voiceDetectionEnabled
+            bottomLeft.style.opacity = checkboxDetection.checked ? '1' : '0.4'
+
+            if (!onVoiceDetectionChange) {
+                onVoiceDetectionChange = () => {
+                    updateSettings({ voiceDetectionEnabled: checkboxDetection.checked })
                 }
+
+                addEventListenerWithCleanup(checkboxDetection, 'change', onVoiceDetectionChange)
             }
-
-            updateUI()
-
-            checkboxDetection.addEventListener('change', updateUI)
         }
 
-        toggleTheme()
         rate()
-        handleVoiceDetection()
+        toggleTheme()
+
         getSettings().then((settings) => {
-            handleAutoDuck(settings)
-            handleDuckLevel(settings)
-            hideRatingsSection(settings.hideRatingsEnabled)
+            handleAutoDuckUI(settings)
+            handleDuckLevelRangeUI(settings)
+            handleVoiceDetectionUI(settings)
+            hideRatingsSectionUI(settings.hideRatingsEnabled)
         })
+
+        const unwatchSettings = watchSettings((settings) => {
+            toggleTheme()
+            handleAutoDuckUI(settings)
+            handleDuckLevelRangeUI(settings)
+            handleVoiceDetectionUI(settings)
+            hideRatingsSectionUI(settings.hideRatingsEnabled)
+        })
+
+        return () => {
+            cleanupFns.forEach((cleanup) => cleanup())
+            browser.runtime.onMessage.removeListener(onSummaryChanged)
+            unwatchSettings()
+        }
     } catch (error) {
         console.log('Home Event:', error)
     }

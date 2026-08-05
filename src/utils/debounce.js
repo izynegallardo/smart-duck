@@ -1,7 +1,23 @@
 export default function debounce(fn, delay) {
-    let timer
-    return (...args) => {
-        clearTimeout(timer)
-        timer = setTimeout(() => fn(...args), delay)
+    let timer = null
+
+    const debounced = (...args) => {
+        if (timer) {
+            clearTimeout(timer)
+        }
+
+        timer = setTimeout(() => {
+            timer = null
+            fn(...args)
+        }, delay)
     }
+
+    debounced.cancel = () => {
+        if (timer) {
+            clearTimeout(timer)
+            timer = null
+        }
+    }
+
+    return debounced
 }

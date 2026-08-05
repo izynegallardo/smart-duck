@@ -37,9 +37,9 @@ export default defineContentScript({
 
             mediaElements.forEach((element) => {
                 if (targetDuckLevel !== null) {
-                    duck(element, targetDuckLevel)
+                    duck(element, targetDuckLevel, settings.fadeDuration)
                 } else {
-                    unduck(element)
+                    unduck(element, settings.fadeDuration)
                 }
             })
 

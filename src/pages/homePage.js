@@ -11,5 +11,5 @@ export default function HomePage() {
     Main(main)
     Footer(footer)
 
-    Events()
+    return Events()
 }

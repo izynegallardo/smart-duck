@@ -11,17 +11,55 @@ export function findMediaElements(root = document) {
 }
 
 const original = new WeakMap()
+const activeFades = new WeakMap()
 
-export function duck(element, duckLevel) {
+function cancelFade(element) {
+    const frameId = activeFades.get(element)
+    if (frameId !== undefined) {
+        cancelAnimationFrame(frameId)
+        activeFades.delete(element)
+    }
+}
+
+function fadeVolume(element, targetVolume, fadeDurationSeconds) {
+    cancelFade(element)
+
+    if (!fadeDurationSeconds || fadeDurationSeconds <= 0) {
+        element.volume = targetVolume
+        return
+    }
+
+    const startVolume = element.volume
+    const startTime = performance.now()
+    const durationMs = fadeDurationSeconds * 1000
+
+    function step(now) {
+        const progress = Math.min((now - startTime) / durationMs, 1)
+        element.volume = startVolume + (targetVolume - startVolume) * progress
+
+        if (progress < 1) {
+            activeFades.set(element, requestAnimationFrame(step))
+        } else {
+            activeFades.delete(element)
+        }
+    }
+
+    activeFades.set(element, requestAnimationFrame(step))
+}
+
+export function duck(element, duckLevel, fadeDurationSeconds = 0) {
     if (!original.has(element)) {
         original.set(element, element.volume)
     }
-    element.volume = original.get(element) * toVolumeMultiplier(duckLevel)
+
+    const targetVolume = original.get(element) * toVolumeMultiplier(duckLevel)
+    fadeVolume(element, targetVolume, fadeDurationSeconds)
 }
 
-export function unduck(element) {
+export function unduck(element, fadeDurationSeconds = 0) {
     if (original.has(element)) {
-        element.volume = original.get(element)
+        const targetVolume = original.get(element)
+        fadeVolume(element, targetVolume, fadeDurationSeconds)
         original.delete(element)
     }
 }
