@@ -10,11 +10,11 @@
     h1,
     p,
     label {
-        font-size: 1rem;
+        font-size: 1.34rem;
     }
 
     h1 {
-        margin-bottom: 1rem;
+        margin: 0 0 1em;
     }
 
     ul {
@@ -34,6 +34,10 @@
         clip: rect(0, 0, 0, 0);
         white-space: nowrap;
         border: 0;
+    }
+
+    section:not(:last-child) {
+        border-bottom: 0.15em solid var(--accent-bg);
     }
 
     .section-container {
@@ -85,10 +89,26 @@
         left: 3px;
     }
 
+    input[type='number'] {
+        background: var(--surface);
+        color: var(--fg);
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        padding: 0.34em 0.58em;
+        font-size: 1.19rem;
+        width: 16%;
+        outline: none;
+        transition: border-color 0.2s;
+    }
+
+    input[type='number']:focus-visible {
+        border-color: var(--accent);
+    }
+
     .top,
     .center,
     .bottom {
-        min-height: 143px;
+        min-height: 144px;
     }
 
     .top {
@@ -101,6 +121,7 @@
     .center-div-group {
         display: flex;
         flex-wrap: wrap;
+        place-items: center;
         gap: 0.75rem;
     }
 
@@ -121,7 +142,32 @@
         user-select: none;
 
         input {
+            position: absolute;
+            opacity: 0;
+            width: 0;
+            height: 0;
             margin: 0;
+        }
+
+        span {
+            padding: 0.34em 0.83em;
+            border-radius: 999px;
+            border: 1px solid var(--border);
+            background: transparent;
+            color: var(--fg);
+            font-size: 1rem;
+            transition: 0.2s;
+        }
+
+        input:checked + span {
+            background: var(--accent-bg);
+            border-color: var(--accent);
+            color: var(--fg);
+        }
+
+        input:focus-visible + span {
+            outline: 2px solid var(--accent);
+            outline-offset: 2px;
         }
     }
 
@@ -130,11 +176,94 @@
         place-items: center;
     }
 
+    .info-button {
+        display: inline-flex;
+        place-items: center;
+        justify-content: center;
+        width: 20px;
+        height: 20px;
+        padding: 0;
+        border-radius: 999px;
+        background: var(--surface);
+        color: inherit;
+        cursor: help;
+        transition:
+            transform 0.2s ease,
+            background-color 0.2s ease,
+            border-color 0.2s ease,
+            color 0.2s ease;
+
+        svg {
+            width: 100%;
+        }
+    }
+
+    .info-button:hover,
+    .info-button:focus-visible {
+        transform: scale(1.05);
+        background: var(--accent-bg);
+        color: var(--accent);
+    }
+
+    .info-button:focus,
+    .info-button:focus-visible,
+    .info-button:active {
+        border: none;
+        outline: none;
+        outline-offset: 0;
+        box-shadow: none;
+    }
+
     .center {
         padding: 0 var(--content-gutter);
+
+        .number-container {
+            display: flex;
+            place-items: center;
+            gap: 1em;
+        }
     }
 
     .bottom {
         padding: 0 var(--content-gutter);
+
+        h1 {
+            margin-bottom: 0;
+        }
+
+        .bottom-div {
+            display: flex;
+            place-items: center;
+            margin: 1.34em 0;
+            border-radius: 6px;
+            padding: 1.34em;
+            width: 100%;
+            background-color: var(--accent-bg);
+
+            .bottom-a {
+                display: flex;
+                place-items: center;
+                color: inherit;
+                transition: 0.3s;
+
+                .chrome-extension-logo {
+                    /* border: 1px solid var(--accent-bg); */
+                    padding: 0.7em;
+                    width: 20%;
+                }
+
+                .bottom-div-span-paragraph {
+                    display: flex;
+                    flex-direction: column;
+                    padding-left: 1.34rem;
+                    width: 100%;
+                }
+            }
+
+            .bottom-a:hover {
+                color: var(--accent);
+                /* text-decoration: underline; */
+            }
+        }
     }
 }

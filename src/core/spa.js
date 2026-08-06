@@ -1,5 +1,6 @@
 class SPA {
     routes = {}
+    currentCleanup = null
 
     constructor(config = {}) {
         this.context = {
@@ -17,10 +18,32 @@ class SPA {
     }
 
     execute(hashPath) {
+        // Tear down whatever the previous route registered (e.g. a
+        // browser.runtime.onMessage listener) before rendering the next
+        // one. Without this, page-scoped listeners from a route you've
+        // already left keep running forever and can throw when they try
+        // to touch DOM elements that belonged to that old page.
+        if (typeof this.currentCleanup === 'function') {
+            try {
+                this.currentCleanup()
+            } catch (error) {
+                // A bug in one route's cleanup should never be able to
+                // block navigation to the next route -- log it and move on.
+                console.error('spa: error during route cleanup', error)
+            }
+            this.currentCleanup = null
+        }
+
         // Formats "#/settings" to "/settings", or default to "/"
         const cleanPath = hashPath.replace(/^#/, '') || '/'
         const routeCallback = this.routes[cleanPath] || this.defaultRoute
-        routeCallback()
+        const cleanup = routeCallback()
+
+        // A route can optionally return its own cleanup function, which we
+        // hold onto until the NEXT navigation.
+        if (typeof cleanup === 'function') {
+            this.currentCleanup = cleanup
+        }
     }
 
     pushRoute(path) {

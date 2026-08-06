@@ -114,6 +114,7 @@
                 text-align: left;
                 margin: 0;
                 padding: 0;
+                width: 100%;
 
                 .center-top-ul-li {
                     display: inline;
@@ -136,9 +137,18 @@
             display: flex;
             flex-direction: column;
             place-items: center;
-            border-bottom: 0.15em solid var(--accent-bg);
-            height: 250px;
-            overflow-y: auto;
+            height: 248px;
+            overflow-y: overlay;
+            overflow-x: hidden;
+
+            &::-webkit-scrollbar {
+                width: 11px;
+            }
+
+            &::-webkit-scrollbar-thumb {
+                background: transparent;
+                border-radius: 4px;
+            }
 
             svg {
                 width: 60%;
@@ -154,7 +164,7 @@
                 align-items: center;
                 gap: 1em;
                 border-bottom: 0.15em solid var(--accent-bg);
-                padding: 1.5% var(--content-gutter);
+                padding: 0.47em 1.5em;
                 width: 100%;
 
                 &.playing {
@@ -164,8 +174,8 @@
                 .center-bottom-tabs-left {
                     .icon-container {
                         img {
-                            width: 60%;
-                            height: 60%;
+                            width: 70%;
+                            height: 70%;
                         }
                     }
                 }
@@ -207,7 +217,7 @@
                     min-width: 30px;
 
                     .pin-icon {
-                        font-size: 1rem;
+                        font-size: 1.34rem;
                         cursor: pointer;
                         opacity: 0.5;
                         transition:
@@ -221,6 +231,11 @@
                     }
                 }
             }
+        }
+
+        .center-bottom:hover {
+            overflow: auto;
+            scrollbar-width: thin;
         }
     }
 
@@ -260,7 +275,7 @@
     place-items: center;
     border-radius: 0.625em;
     color: white;
-    font-size: 1.125rem;
+    font-size: 1.34rem;
 }
 
 .top-range-left {

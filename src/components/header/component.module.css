@@ -3,7 +3,7 @@
     justify-content: space-between;
     text-align: left;
     border-bottom: 0.15em solid var(--accent-bg);
-    padding: 1% var(--content-gutter);
+    padding: 1em var(--content-gutter);
     width: 100%;
     background-color: var(--accent-bg);
 
@@ -27,7 +27,7 @@
         }
 
         h1 {
-            font-size: 1rem;
+            font-size: 1.34rem;
         }
 
         p {

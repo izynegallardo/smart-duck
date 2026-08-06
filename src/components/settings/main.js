@@ -1,4 +1,7 @@
 import styles from './component.module.css'
+import ChromeExtensionLogo from '@/assets/google_chrome_web_store_icon_2022.svg.webp'
+import InfoButton from './info'
+import { updateIcons } from '@/helpers/lucide'
 
 export default function Main(root) {
     root.innerHTML = `
@@ -30,6 +33,10 @@ export default function Main(root) {
                             <span class='${styles['checkbox-slider']}'></span>
                         </label>
                     </div>
+                    ${InfoButton({
+                        title: 'Hide the ratings section on the footer',
+                        ariaLabel: 'More information about hiding the ratings section',
+                    })}
                 </div>
             </div>
         </section>
@@ -46,9 +53,17 @@ export default function Main(root) {
                             <span class='${styles['checkbox-slider']}'></span>
                         </label>
                     </div>
-                    <div>
+                    ${InfoButton({
+                        title: 'Use Duck Strength (how strong ducking will apply) instead of Background Volume',
+                        ariaLabel: 'More information about opposite semantics',
+                    })}
+                    <div class='${styles['number-container']}'>
                         <label for='volume-fade-duration' class='${styles['center-div-fade-label']}'>Fade duration (seconds)</label>
                         <input id='volume-fade-duration' type='number' min='0' step='1' value='0' />
+                        ${InfoButton({
+                            title: 'Set how long the volume fade lasts when switching tabs',
+                            ariaLabel: 'More information about fade duration',
+                        })}
                     </div>
                 </div>
             </div>
@@ -57,9 +72,19 @@ export default function Main(root) {
         <section class='${styles['bottom']}'>
             <h1>My other extensions</h1>
             <div class='${styles['section-container']}'>
-
+                <div class='${styles['bottom-div']}'>
+                    <a class='${styles['bottom-a']}' href='#' target='_blank'>
+                        <img class='${styles['chrome-extension-logo']}' src='${ChromeExtensionLogo}' alt='chrome extension logo'>
+                        <div class='${styles['bottom-div-span-paragraph']}'>
+                            <span>Available in the</span>
+                            <p>Chrome Web Store</p>
+                        </div>
+                    </a>
+                <div>
             </div>
         </section>
     `
+
+    updateIcons(root)
     root.className = styles['main']
 }

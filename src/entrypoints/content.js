@@ -16,7 +16,7 @@ export default defineContentScript({
             volume: tabVolume,
         } = await sendMessage(MSG.GET_TAB_OVERRIDE)
 
-        function applyDuckState() {
+        function applyDuckState(shouldFade = true) {
             let mediaElements = findMediaElements()
             isDucked = settings.autoDuckEnabled && !isPrimary
 
@@ -35,11 +35,13 @@ export default defineContentScript({
                     ? toBackgroundVolume(rawLevel, settings.useOppositeSematics)
                     : rawLevel
 
+            const fadeDuration = shouldFade ? settings.fadeDuration : 0
+
             mediaElements.forEach((element) => {
                 if (targetDuckLevel !== null) {
-                    duck(element, targetDuckLevel, settings.fadeDuration)
+                    duck(element, targetDuckLevel, fadeDuration)
                 } else {
-                    unduck(element, settings.fadeDuration)
+                    unduck(element, fadeDuration)
                 }
             })
 
@@ -53,16 +55,17 @@ export default defineContentScript({
             })
         }
 
-        applyDuckState()
+        applyDuckState(false)
 
         const observer = new MutationObserver(debounce(() => applyDuckState(), 250))
         observer.observe(document.body, { childList: true, subtree: true })
 
-        document.addEventListener('visibilitychange', applyDuckState)
+        document.addEventListener('visibilitychange', () => applyDuckState(true))
 
         watchSettings((newSettings) => {
+            const duckLevelChanged = newSettings.duckLevel !== settings.duckLevel
             settings = newSettings
-            applyDuckState()
+            applyDuckState(!duckLevelChanged)
         })
 
         browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
@@ -77,12 +80,13 @@ export default defineContentScript({
 
             if (message.type === MSG.PRIMARY_CHANGED) {
                 isPrimary = message.payload.isPrimary
-                applyDuckState()
+                applyDuckState(true)
             }
+
             if (message.type === MSG.TAB_OVERRIDE_CHANGED) {
                 isMuted = message.payload.muted
                 tabVolume = message.payload.volume
-                applyDuckState()
+                applyDuckState(false)
             }
         })
     },

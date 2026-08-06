@@ -2,19 +2,19 @@
     display: flex;
     flex-direction: column;
     justify-content: space-around;
-    gap: 1em;
+    gap: 0.2em;
     width: 100%;
     border-top: 0.15em solid var(--accent-bg);
-    padding: 2.5% var(--content-gutter);
+    padding: 1em var(--content-gutter);
     text-align: left;
     background-color: var(--accent-bg);
 
-    .hidden {
-        display: none;
-    }
-
     .top {
         margin: 0 auto;
+    }
+
+    .top.hidden {
+        display: none;
     }
 
     .bottom {

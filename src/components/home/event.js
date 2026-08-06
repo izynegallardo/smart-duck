@@ -62,6 +62,14 @@ export default function Event() {
             if (volumeSpan) {
                 volumeSpan.textContent = `${event.target.value}%`
             }
+
+            const percent = event.target.value
+            event.target.style.background = `linear-gradient(to right,
+                #0088cc 0%,
+                #0088cc ${percent}%,
+                #555 ${percent}%,
+                #555 100%)
+            `
         }
         addEventListenerWithCleanup(centerButtom, 'input', onVolumeInput)
 
@@ -121,8 +129,8 @@ export default function Event() {
             const percent = (value / max) * 100
 
             topRangeEl.style.background = `linear-gradient(to right,
-                #5b6dff 0%,
-                #5b6dff ${percent}%,
+                #0088cc 0%,
+                #0088cc ${percent}%,
                 #555 ${percent}%,
                 #555 100%)
             `
@@ -169,6 +177,8 @@ export default function Event() {
                     `
                 }
 
+                const tabPercent = tab.volume ?? 100
+
                 container += `
                         <div class="${styles['center-bottom-tabs']} ${tab.status === 'playing' ? styles.playing : ''}">
                             <section class='${styles['center-bottom-tabs-left']}'>
@@ -187,7 +197,7 @@ export default function Event() {
                                     ${waveBars}
                                 </div>
                                 <div class='${styles['center-bottom-tabs-center-bottom']} ${autoDuckEnabled ? styles['hidden'] : ''}'>
-                                    <input id='${tab.id}' type="range" min="0" max="100" value='${tab.volume ?? 100}' ${autoDuckEnabled ? 'disabled' : ''}>
+                                    <input id='${tab.id}' type="range" min="0" max="100" value='${tabPercent}' style='background: linear-gradient(to right, #0088cc 0%, #0088cc ${tabPercent}%, #555 ${tabPercent}%, #555 100%)' ${autoDuckEnabled ? 'disabled' : ''}>
                                 </div>
                             </section>
                             

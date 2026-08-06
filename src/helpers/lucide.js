@@ -1,4 +1,4 @@
-import { createIcons, Speech, Origami, Settings, Volume2, VolumeX } from 'lucide'
+import { createIcons, Speech, Origami, Settings, Volume2, VolumeX, Info } from 'lucide'
 
 // Register all icons application will ever use here
 const availableIcons = {
@@ -7,6 +7,7 @@ const availableIcons = {
     Origami,
     Volume2,
     VolumeX,
+    Info,
 }
 
 /**
