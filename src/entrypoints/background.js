@@ -6,6 +6,52 @@ const tabState = new Map()
 const tabOverrides = new Map()
 let focusedWindowId = null
 let primaryTabId = null
+const captureStateByTab = new Map()
+
+const PENDING_CAPTURE_TIMEOUT_MS = 8000
+
+let offscreenReadyPromise = null
+
+async function ensureOffscreenDocument() {
+    if (offscreenReadyPromise) return offscreenReadyPromise
+
+    offscreenReadyPromise = (async () => {
+        const existingContexts = await browser.runtime.getContexts({
+            contextTypes: ['OFFSCREEN_DOCUMENT'],
+        })
+
+        if (existingContexts.length > 0) return
+
+        await browser.offscreen.createDocument({
+            reasons: ['USER_MEDIA'],
+            justification:
+                'Re-routes captured tab audio through a GainNode so background tabs can be volume-adjusted even when the page controls its own audio via the Web Audio API.',
+        })
+    })()
+
+    return offscreenReadyPromise
+}
+async function requestCaptureForTab(tabId) {
+    const state = captureStateByTab.get(tabId)
+
+    if (state?.status === 'pending' || state?.status === 'active') return
+
+    const generation = (state?.generation ?? 0) + 1
+
+    const timeoutId = setTimeout(() => {
+        const current = captureStateByTab.get(tabId)
+
+        if (!current || current.generation !== generation || current.status !== 'pending') return
+
+        captureStateByTab.delete(tabId)
+    }, PENDING_CAPTURE_TIMEOUT_MS)
+
+    captureStateByTab.set(tabId, {
+        status: 'pending',
+        generation,
+        timeoutId,
+    })
+}
 
 function computeSummary() {
     const states = [...tabState.values()]
@@ -78,13 +124,20 @@ export default defineBackground(() => {
 
             broadcastSummary()
         }
+        if (message.type === MSG.REQUEST_CAPTURE) {
+        }
+        if (message.type === MSG.CAPTURE_READY) {
+        }
+        if (message.type === MSG.CAPTURE_ENDED) {
+        }
+        if (message.type === MSG.SET_CAPTURED_VOLUME) {
+        }
     })
 
     browser.tabs.onRemoved.addListener((tabId, removeInfo) => {
         tabState.delete(tabId)
         tabOverrides.delete(tabId)
         console.log('remove', tabState)
-
         broadcastSummary()
     })
 

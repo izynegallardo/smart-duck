@@ -6,6 +6,7 @@ import debounce from '@/utils/debounce'
 
 export default defineContentScript({
     matches: ['<all_urls>'],
+    allFrames: true,
     async main() {
         let settings = await getSettings()
         let isPrimary = (await sendMessage(MSG.GET_PRIMARY)).isPrimary

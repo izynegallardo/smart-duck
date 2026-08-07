@@ -11,7 +11,7 @@ export default defineConfig({
         description:
             'Automatically lowers the volume of background tabs so the tab that matters stays audible.',
         version: '0.0.1',
-        permissions: ['storage', 'tabs', 'scripting'],
+        permissions: ['storage', 'tabs', 'scripting', 'tabCapture', 'offscreen'],
         host_permissions: ['<all_urls>'],
         icons: {
             16: 'icons/16.png',
