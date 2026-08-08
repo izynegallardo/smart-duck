@@ -6,10 +6,9 @@ const tabState = new Map()
 const tabOverrides = new Map()
 let focusedWindowId = null
 let primaryTabId = null
+
 const captureStateByTab = new Map()
-
 const PENDING_CAPTURE_TIMEOUT_MS = 8000
-
 let offscreenReadyPromise = null
 
 async function ensureOffscreenDocument() {
@@ -23,6 +22,7 @@ async function ensureOffscreenDocument() {
         if (existingContexts.length > 0) return
 
         await browser.offscreen.createDocument({
+            url: '/offscreen.html',
             reasons: ['USER_MEDIA'],
             justification:
                 'Re-routes captured tab audio through a GainNode so background tabs can be volume-adjusted even when the page controls its own audio via the Web Audio API.',
@@ -31,6 +31,7 @@ async function ensureOffscreenDocument() {
 
     return offscreenReadyPromise
 }
+
 async function requestCaptureForTab(tabId) {
     const state = captureStateByTab.get(tabId)
 
@@ -43,7 +44,10 @@ async function requestCaptureForTab(tabId) {
 
         if (!current || current.generation !== generation || current.status !== 'pending') return
 
-        captureStateByTab.delete(tabId)
+        captureStateByTab.set(tabId, {
+            status: 'idle',
+            generation,
+        })
     }, PENDING_CAPTURE_TIMEOUT_MS)
 
     captureStateByTab.set(tabId, {
@@ -51,6 +55,18 @@ async function requestCaptureForTab(tabId) {
         generation,
         timeoutId,
     })
+
+    try {
+        const streamId = await browser.tabCapture.getMediaStreamId({ targetTabId: tabId })
+        await ensureOffscreenDocument()
+        sendMessage(MSG.CAPTURE_STREAM, { tabId, streamId, generation })
+    } catch (error) {
+        clearTimeout(timeoutId)
+        captureStateByTab.set(tabId, {
+            status: 'idle',
+            generation,
+        })
+    }
 }
 
 function computeSummary() {
@@ -124,13 +140,67 @@ export default defineBackground(() => {
 
             broadcastSummary()
         }
+
         if (message.type === MSG.REQUEST_CAPTURE) {
+            if (message.payload?.tabId) {
+                requestCaptureForTab(message.payload.tabId)
+            } else {
+                tabState.forEach((state, tabId) => {
+                    requestCaptureForTab(tabId)
+                })
+            }
         }
+
         if (message.type === MSG.CAPTURE_READY) {
+            const { tabId, generation, success, reason } = message.payload
+            const entry = captureStateByTab.get(tabId)
+
+            if (!entry || entry.status !== 'pending' || entry.generation !== generation) return
+
+            clearTimeout(entry.timeoutId)
+
+            if (success) {
+                captureStateByTab.set(tabId, {
+                    status: 'active',
+                    generation,
+                })
+
+                sendTabMessage(tabId, MSG.CAPTURE_STATE_CHANGED, { isCaptured: true }).catch(
+                    () => {},
+                )
+            } else {
+                captureStateByTab.set(tabId, { status: 'idle', generation })
+            }
         }
+
         if (message.type === MSG.CAPTURE_ENDED) {
+            const { tabId, generation, success, reason } = message.payload
+            const entry = captureStateByTab.get(tabId)
+
+            if (!entry || entry.status !== 'active' || entry.generation !== generation) return
+
+            captureStateByTab.set(tabId, { status: 'idle', generation })
+
+            sendTabMessage(tabId, MSG.CAPTURE_STATE_CHANGED, {
+                isCaptured: false,
+            }).catch(() => {})
         }
+
         if (message.type === MSG.SET_CAPTURED_VOLUME) {
+            const { volume, fadeDuration } = message.payload
+            const tabId = sender.tab?.id
+
+            if (tabId == null) return
+
+            const entry = captureStateByTab.get(tabId)
+
+            if (!entry || entry.status !== 'active') return
+
+            sendMessage(MSG.SET_CAPTURED_VOLUME, {
+                tabId: sender.tab.id,
+                volume,
+                fadeDuration,
+            }).catch(() => {})
         }
     })
 
@@ -138,6 +208,19 @@ export default defineBackground(() => {
         tabState.delete(tabId)
         tabOverrides.delete(tabId)
         console.log('remove', tabState)
+
+        const entry = captureStateByTab.get(tabId)
+
+        if (entry) {
+            if (entry.timeoutId) {
+                clearTimeout(entry.timeoutId)
+            }
+
+            sendMessage(MSG.STOP_CAPTURE, { tabId }).catch(() => {})
+
+            captureStateByTab.delete(tabId)
+        }
+
         broadcastSummary()
     })
 
