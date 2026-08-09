@@ -57,6 +57,7 @@ function handleSetCapturedVolume({ tabId, volume, fadeDuration }) {
     const targetGain = toVolumeMultiplier(volume)
 
     gainNode.gain.cancelScheduledValues(audioContext.currentTime)
+    gainNode.gain.setValueAtTime(gainNode.gain.value, audioContext.currentTime)
 
     if (fadeDuration > 0) {
         gainNode.gain.linearRampToValueAtTime(targetGain, audioContext.currentTime + fadeDuration)
@@ -76,7 +77,7 @@ function handleStopCapture({ tabId }) {
         track.stop()
     })
 
-    entry.audioContext.close()
+    entry.audioContext.close().catch(() => {})
 }
 
 browser.runtime.onMessage.addListener((message) => {

@@ -10,6 +10,7 @@ export default defineContentScript({
     async main() {
         let settings = await getSettings()
         let isPrimary = (await sendMessage(MSG.GET_PRIMARY)).isPrimary
+        let isCaptured = (await sendMessage(MSG.GET_CAPTURE_STATE)).isCaptured
         let isDucked = false
         let {
             muted: isMuted,
@@ -38,13 +39,20 @@ export default defineContentScript({
 
             const fadeDuration = shouldFade ? settings.fadeDuration : 0
 
-            mediaElements.forEach((element) => {
-                if (targetDuckLevel !== null) {
-                    duck(element, targetDuckLevel, fadeDuration)
-                } else {
-                    unduck(element, fadeDuration)
+            if (isCaptured) {
+                sendMessage(MSG.SET_CAPTURED_VOLUME, {
+                    volume: targetDuckLevel ?? 100,
+                    fadeDuration,
+                })
+            } else {
+                for (const media of mediaElements) {
+                    if (targetDuckLevel !== null) {
+                        duck(media, targetDuckLevel, fadeDuration)
+                    } else {
+                        unduck(media, fadeDuration)
+                    }
                 }
-            })
+            }
 
             sendMessage(MSG.MEDIA_STATE_CHANGED, {
                 ducked: isDucked,
@@ -87,6 +95,11 @@ export default defineContentScript({
             if (message.type === MSG.TAB_OVERRIDE_CHANGED) {
                 isMuted = message.payload.muted
                 tabVolume = message.payload.volume
+                applyDuckState(false)
+            }
+
+            if (message.type === MSG.CAPTURE_STATE_CHANGED) {
+                isCaptured = message.payload.isCaptured
                 applyDuckState(false)
             }
         })

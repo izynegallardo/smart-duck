@@ -1,6 +1,7 @@
 import styles from './component.module.css'
 import IconContainer from './icon'
 import toggleTheme from '@/utils/toggleTheme'
+import toggleAccentTheme from '@/utils/toggleAccentTheme'
 import rate from '@/utils/rate'
 import hideRatingsSectionUI from '@/utils/hideRatings'
 import { MSG, sendMessage } from '@/core/messaging'
@@ -82,6 +83,8 @@ export default function Event() {
                 tabId,
                 patch: { volume: Number(event.target.value) },
             })
+
+            sendMessage(MSG.REQUEST_CAPTURE, { tabId })
         }
         addEventListenerWithCleanup(centerButtom, 'change', onVolumeChange)
 
@@ -90,13 +93,16 @@ export default function Event() {
             const topSection = document.getElementById('top')
             const checkboxLabel = document.getElementById('checkbox-switch')
             const topRangeDiv = document.getElementById('top-div-range')
+
             const hiddenClassName = styles['hidden'] || 'hidden'
+            const showClassName = styles['show'] || 'show'
 
             checkboxDuck.checked = settings.autoDuckEnabled
             autoDuckEnabled = settings.autoDuckEnabled
 
             topSection.classList.toggle(hiddenClassName, !autoDuckEnabled)
             topRangeDiv.classList.toggle(hiddenClassName, !autoDuckEnabled)
+            centerButtom.classList.toggle(showClassName, !autoDuckEnabled)
 
             checkboxLabel.title = autoDuckEnabled
                 ? 'Disable automatic ducking'
@@ -140,6 +146,8 @@ export default function Event() {
         addEventListenerWithCleanup(topRangeEl, 'input', updateRangeGradient)
         const onDuckLevelChange = () => {
             updateSettings({ duckLevel: Number(topRangeEl.value) })
+
+            sendMessage(MSG.REQUEST_CAPTURE)
         }
         addEventListenerWithCleanup(topRangeEl, 'change', onDuckLevelChange)
 
@@ -190,7 +198,7 @@ export default function Event() {
                             
                             <section id='center-bottom-tabs-center' class='${styles['center-bottom-tabs-center']} ${autoDuckEnabled ? styles['hidden'] : ''}'>
                                 <div class='${styles['center-bottom-tabs-center-top']}'>
-                                    <div style='width:80%'>
+                                    <div class='${styles['center-bottom-tabs-center-top-label']}'>
                                         <label for='${tab.id}'>${tab.name}</label>
                                         <p style='opacity: 0.8'>${tab.domain}</p>
                                     </div>
@@ -264,8 +272,10 @@ export default function Event() {
 
         rate()
         toggleTheme()
+        toggleAccentTheme()
 
         getSettings().then((settings) => {
+            toggleAccentTheme()
             handleAutoDuckUI(settings)
             handleDuckLevelRangeUI(settings)
             handleVoiceDetectionUI(settings)

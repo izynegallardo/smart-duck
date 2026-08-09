@@ -90,7 +90,7 @@
     }
 
     input[type='number'] {
-        background: var(--surface);
+        background: inherit;
         color: var(--fg);
         border: 1px solid var(--border);
         border-radius: 6px;
@@ -184,7 +184,7 @@
         height: 20px;
         padding: 0;
         border-radius: 999px;
-        background: var(--surface);
+        background: inherit;
         color: inherit;
         cursor: help;
         transition:

@@ -24,8 +24,9 @@ async function ensureOffscreenDocument() {
         await browser.offscreen.createDocument({
             url: '/offscreen.html',
             reasons: ['USER_MEDIA'],
-            justification:
-                'Re-routes captured tab audio through a GainNode so background tabs can be volume-adjusted even when the page controls its own audio via the Web Audio API.',
+            justification: `Re-routes captured tab audio through a GainNode so 
+                background tabs can be volume-adjusted even when
+                the page controls its own audio via the Web Audio API.`,
         })
     })()
 
@@ -74,7 +75,9 @@ function computeSummary() {
 
     return {
         tabs: tabState.size,
-        playing: states.filter((state) => state.elements.some((element) => element.playing)).length,
+        playing: states.filter(
+            (state) => state.elements.some((element) => element.playing) || state.audible,
+        ).length,
         ducked: states.filter((state) => state.ducked).length,
         list: [...tabState.entries()].map(([id, state]) => ({
             id,
@@ -82,7 +85,10 @@ function computeSummary() {
             name: truncate(state.title, 50),
             domain: new URL(state.url).hostname,
             url: state.url,
-            status: state.elements.some((element) => element.playing) ? 'playing' : 'stopped',
+            status:
+                state.elements.some((element) => element.playing) || state.audible
+                    ? 'playing'
+                    : 'stopped',
             ducked: state.ducked,
             muted: state.muted,
             volume: state.volume,
@@ -100,7 +106,7 @@ export default defineBackground(() => {
         if (message.type === MSG.MEDIA_STATE_CHANGED && sender.tab) {
             if (message.payload.url !== sender.tab.url) return
 
-            if (message.payload.elements.length === 0) {
+            if (message.payload.elements.length === 0 && !sender.tab.audible) {
                 tabState.delete(sender.tab.id)
             } else {
                 tabState.set(sender.tab.id, {
@@ -108,8 +114,9 @@ export default defineBackground(() => {
                     title: sender.tab.title,
                     url: sender.tab.url,
                     favIconUrl: sender.tab.favIconUrl,
+                    audible: sender.tab.audible,
                 })
-                console.log('set', tabState)
+                // console.log('set', tabState)
             }
 
             broadcastSummary()
@@ -139,6 +146,12 @@ export default defineBackground(() => {
             sendTabMessage(tabId, MSG.TAB_OVERRIDE_CHANGED, next).catch(() => {})
 
             broadcastSummary()
+        }
+
+        if (message.type === MSG.GET_CAPTURE_STATE) {
+            sendResponse({
+                isCaptured: captureStateByTab.get(sender.tab?.id)?.status === 'active',
+            })
         }
 
         if (message.type === MSG.REQUEST_CAPTURE) {
@@ -207,8 +220,7 @@ export default defineBackground(() => {
     browser.tabs.onRemoved.addListener((tabId, removeInfo) => {
         tabState.delete(tabId)
         tabOverrides.delete(tabId)
-        console.log('remove', tabState)
-
+        // console.log('remove', tabState)
         const entry = captureStateByTab.get(tabId)
 
         if (entry) {
@@ -227,6 +239,28 @@ export default defineBackground(() => {
     browser.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
         if (changeInfo.status === 'loading' && changeInfo.url) {
             tabState.delete(tabId)
+            broadcastSummary()
+        }
+
+        if (changeInfo.audible !== undefined) {
+            const current = tabState.get(tabId)
+
+            if (!changeInfo.audible && (!current || current.elements.length === 0)) {
+                tabState.delete(tabId)
+            } else {
+                tabState.set(tabId, {
+                    elements: [],
+                    ducked: false,
+                    muted: tabOverrides.get(tabId)?.muted ?? false,
+                    volume: tabOverrides.get(tabId)?.volume ?? null,
+                    ...current,
+                    title: tab.title,
+                    url: tab.url,
+                    favIconUrl: tab.favIconUrl,
+                    audible: changeInfo.audible,
+                })
+            }
+
             broadcastSummary()
         }
     })

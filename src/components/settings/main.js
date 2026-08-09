@@ -24,6 +24,24 @@ export default function Main(root) {
                         <span>Dark</span>
                     </label>
                 </div>
+
+                <div class='${styles['top-div-group']}' role='radiogroup' aria-labelledby='accent-theme-label'>
+                    <span class='${styles['hidden']}'>Choose an accent theme that layers on top of light or dark mode</span>
+                    <label class='${styles['top-div-mode-label']}' id='accent-theme-label'>Accent:</label>
+                    <label class='${styles['top-div-mode-option']}'>
+                        <input type='radio' name='accentTheme' value='none' checked />
+                        <span>None</span>
+                    </label>
+                    <label class='${styles['top-div-mode-option']}'>
+                        <input type='radio' name='accentTheme' value='sunset' />
+                        <span>Sunset</span>
+                    </label>
+                    <label class='${styles['top-div-mode-option']}'>
+                        <input type='radio' name='accentTheme' value='underwater' />
+                        <span>Underwater</span>
+                    </label>
+                </div>
+                
                 <div class='${styles['top-div-group']}' role='group' aria-describedby='ratings-toggle-desc'>
                     <span id='ratings-toggle-desc' class='${styles['hidden']}'>Show or hide the ratings section on the home page</span>
                     <label for='checkbox-ratings' class='${styles['top-div-rating-label']}'>Hide ratings section: </label>
@@ -73,7 +91,7 @@ export default function Main(root) {
             <h1>My other extensions</h1>
             <div class='${styles['section-container']}'>
                 <div class='${styles['bottom-div']}'>
-                    <a class='${styles['bottom-a']}' href='#' target='_blank'>
+                    <a class='${styles['bottom-a']}' href='https://chromewebstore.google.com' target='_blank'>
                         <img class='${styles['chrome-extension-logo']}' src='${ChromeExtensionLogo}' alt='chrome extension logo'>
                         <div class='${styles['bottom-div-span-paragraph']}'>
                             <span>Available in the</span>

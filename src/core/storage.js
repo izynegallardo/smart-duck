@@ -6,6 +6,7 @@ const DEFAULT_SETTINGS = {
     autoDuckEnabled: true,
     voiceDetectionEnabled: false,
     theme: 'system',
+    accentTheme: 'none',
     hideRatingsEnabled: false,
     useOppositeSematics: false,
 }

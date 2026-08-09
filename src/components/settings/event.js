@@ -1,5 +1,6 @@
 import { getSettings, updateSettings, watchSettings } from '@/core/storage'
 import toggleTheme from '@/utils/toggleTheme'
+import toggleAccentTheme from '@/utils/toggleAccentTheme'
 import debounce from '@/utils/debounce'
 import hideRatingsSection from '@/utils/hideRatings'
 import rate from '@/utils/rate'
@@ -85,6 +86,7 @@ export default function Event() {
 
         rate()
         toggleTheme()
+        toggleAccentTheme()
 
         getSettings().then((settings) => {
             handleHideRatings(settings)
@@ -94,6 +96,7 @@ export default function Event() {
 
         const unwatchSettings = watchSettings((settings) => {
             toggleTheme()
+            toggleAccentTheme()
             handleHideRatings(settings)
             handleSwitchSemantics(settings)
             updateFadeDuration(settings)
