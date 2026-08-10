@@ -1,6 +1,6 @@
 import { getSettings, updateSettings } from '@/core/storage'
 
-const ACCENT_CLASSES = ['sunset', 'underwater']
+const ACCENT_CLASSES = ['day', 'night', 'sunset', 'deep']
 
 export default async function toggleAccentTheme() {
     const accentThemeRadioBtns = document.querySelectorAll('input[name="accentTheme"]')

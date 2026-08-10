@@ -19,7 +19,7 @@
         #6c2c6b 96%,
         #30218a 100%
     );
-    --underwater: linear-gradient(
+    --deep: linear-gradient(
         to bottom,
         #e8f5f5 0%,
         #c8e5e9 4%,
@@ -55,19 +55,30 @@
     --mono: ui-monospace, Consolas, monospace;
 }
 
-body.dark {
+body.dark,
+body.night,
+body.sunset {
     --surface: var(--accent-bg);
     --fg: rgba(255, 255, 255, 0.87);
 }
 
-body.sunset {
-    --surface: var(--sunset);
-    --fg: rgba(255, 255, 255, 0.87);
+/* Accent Themes */
+
+body.day {
+    --surface: linear-gradient(to bottom, #f8fcfd 0%, #eef9fc 35%, #dff3fa 68%, #c9eaf7 100%);
+    --fg: var(--text-h);
 }
 
-body.underwater {
-    --surface: var(--underwater);
-    --fg: rgba(255, 255, 255, 0.87);
+body.night {
+    --surface: linear-gradient(to bottom, #183b4d 0%, #123244 35%, #0d2939 68%, #081d2b 100%);
+}
+
+body.sunset {
+    --surface: var(--sunset);
+}
+
+body.deep {
+    --surface: var(--deep);
 }
 
 *,

@@ -25,7 +25,7 @@ export default function Main(root) {
                     </label>
                 </div>
 
-                <div class='${styles['top-div-group']}' role='radiogroup' aria-labelledby='accent-theme-label'>
+                <div class='${styles['top-div-group']} ${styles['no-wrap']} ' role='radiogroup' aria-labelledby='accent-theme-label'>
                     <span class='${styles['hidden']}'>Choose an accent theme that layers on top of light or dark mode</span>
                     <label class='${styles['top-div-mode-label']}' id='accent-theme-label'>Accent:</label>
                     <label class='${styles['top-div-mode-option']}'>
@@ -33,12 +33,20 @@ export default function Main(root) {
                         <span>None</span>
                     </label>
                     <label class='${styles['top-div-mode-option']}'>
+                        <input type='radio' name='accentTheme' value='day' />
+                        <span>Day</span>
+                    </label>
+                    <label class='${styles['top-div-mode-option']}'>
+                        <input type='radio' name='accentTheme' value='night' />
+                        <span>Night</span>
+                    </label>
+                    <label class='${styles['top-div-mode-option']}'>
                         <input type='radio' name='accentTheme' value='sunset' />
                         <span>Sunset</span>
                     </label>
                     <label class='${styles['top-div-mode-option']}'>
-                        <input type='radio' name='accentTheme' value='underwater' />
-                        <span>Underwater</span>
+                        <input type='radio' name='accentTheme' value='deep' />
+                        <span>Deep</span>
                     </label>
                 </div>
                 
