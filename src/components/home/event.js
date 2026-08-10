@@ -250,26 +250,6 @@ export default function Event() {
 
         browser.runtime.onMessage.addListener(onSummaryChanged)
 
-        let onVoiceDetectionChange = null
-
-        function handleVoiceDetectionUI(settings) {
-            const checkboxDetection = document.getElementById('checkbox-detection')
-            const bottomLeft = document.getElementById('bottom-left')
-
-            if (!checkboxDetection || !bottomLeft) return
-
-            checkboxDetection.checked = settings.voiceDetectionEnabled
-            bottomLeft.style.opacity = checkboxDetection.checked ? '1' : '0.4'
-
-            if (!onVoiceDetectionChange) {
-                onVoiceDetectionChange = () => {
-                    updateSettings({ voiceDetectionEnabled: checkboxDetection.checked })
-                }
-
-                addEventListenerWithCleanup(checkboxDetection, 'change', onVoiceDetectionChange)
-            }
-        }
-
         rate()
         toggleTheme()
         toggleAccentTheme()
@@ -278,7 +258,6 @@ export default function Event() {
             toggleAccentTheme()
             handleAutoDuckUI(settings)
             handleDuckLevelRangeUI(settings)
-            handleVoiceDetectionUI(settings)
             hideRatingsSectionUI(settings.hideRatingsEnabled)
         })
 
@@ -286,7 +265,6 @@ export default function Event() {
             toggleTheme()
             handleAutoDuckUI(settings)
             handleDuckLevelRangeUI(settings)
-            handleVoiceDetectionUI(settings)
             hideRatingsSectionUI(settings.hideRatingsEnabled)
         })
 

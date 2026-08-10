@@ -1,4 +1,5 @@
 import styles from './component.module.css'
+import SmartDuckLogo from '@/assets/logo.svg'
 import { updateIcons } from '@/helpers/lucide'
 
 /**
@@ -27,8 +28,8 @@ export default function Header(
             </div>
         `
         : `
-            <div>
-                <i data-lucide="origami"></i>  
+            <div class='${styles['logo-div']}'>
+                <img class='${styles['logo-svg']}' src='${SmartDuckLogo}' alt='Smart duck logo, a pixel yellow duck producing sound waves in its beak'>  
             </div>
             <div>
                 <h1>${title}</h1>

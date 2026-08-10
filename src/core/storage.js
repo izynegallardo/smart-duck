@@ -4,7 +4,6 @@ const DEFAULT_SETTINGS = {
     duckLevel: 20,
     fadeDuration: 0,
     autoDuckEnabled: true,
-    voiceDetectionEnabled: false,
     theme: 'system',
     accentTheme: 'none',
     hideRatingsEnabled: false,

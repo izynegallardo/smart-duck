@@ -96,7 +96,7 @@
         border-radius: 6px;
         padding: 0.34em 0.58em;
         font-size: 1.19rem;
-        width: 16%;
+        width: 18%;
         outline: none;
         transition: border-color 0.2s;
     }
@@ -108,7 +108,7 @@
     .top,
     .center,
     .bottom {
-        min-height: 144px;
+        min-height: 143.8px;
     }
 
     .top {

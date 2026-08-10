@@ -37,27 +37,6 @@ export default function Main(root) {
                 <p class='${styles['center-bottom-p']}'>No active tabs</p>
             </div>
         </section>
-        
-        <section class='${styles['bottom']}'>
-            <div id='bottom-left' class='${styles['bottom-left']}'>
-                <div class='${styles['bottom-left-checkbox']}'>
-                    <div class="${styles['icon-container']}" style="background-color: #125678" aria-label="speech">
-                        <i data-lucide="speech"></i>  
-                    </div>
-                </div>
-                <div class='${styles['bottom-center-checkbox']}'>
-                    <label for='checkbox-detection'>Voice Detection</label>
-                    <span class='${styles['bottom-center-span']}'>BETA</span>
-                    <p>Ducks background audio when a voice is detected. Experimental feature.</p>
-                </div>
-            </div>
-            <div class='${styles['bottom-right-checkbox']}'>
-                <label class='${styles['checkbox-switch']}'>
-                    <input id='checkbox-detection' type="checkbox">
-                    <span class='${styles['checkbox-slider']}'></span>
-                </label> 
-            </div>
-        </section>
     `
     updateIcons(root)
     root.className = styles['main']

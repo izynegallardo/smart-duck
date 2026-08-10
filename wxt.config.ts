@@ -10,7 +10,7 @@ export default defineConfig({
         name: 'Smart Duck',
         description:
             'Automatically lowers the volume of background tabs so the tab that matters stays audible.',
-        version: '0.0.1',
+        version: '1.0.0',
         permissions: ['storage', 'tabs', 'scripting', 'tabCapture', 'offscreen'],
         host_permissions: ['<all_urls>'],
         icons: {
@@ -21,4 +21,10 @@ export default defineConfig({
             128: 'icons/128.png',
         },
     },
+
+    vite: () => ({
+        build: {
+            modulePreload: false,
+        },
+    }),
 })

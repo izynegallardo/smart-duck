@@ -98,7 +98,7 @@ export default function Main(root) {
                             <p>Chrome Web Store</p>
                         </div>
                     </a>
-                <div>
+                </div>
             </div>
         </section>
     `

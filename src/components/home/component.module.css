@@ -137,9 +137,9 @@
             display: flex;
             flex-direction: column;
             place-items: center;
-            border-bottom: 0.15em solid var(--accent-bg);
-            height: 248px;
+            height: 316px;
             overflow-y: overlay;
+            scrollbar-width: thin;
             overflow-x: hidden;
             transition: height 0.3s;
 
@@ -157,7 +157,8 @@
             }
 
             .center-bottom-p {
-                margin: 28% 0;
+                flex: 1;
+                margin: 39% 0;
             }
 
             .center-bottom-tabs {
@@ -242,18 +243,17 @@
 
         .center-bottom:hover {
             overflow: auto;
-            scrollbar-width: thin;
         }
 
         .center-bottom.show {
-            height: 288px;
+            height: 330px;
         }
 
         .center-bottom-tabs {
             border-bottom: 0.15em solid var(--accent-bg);
         }
 
-        .center-bottom:has(> .center-bottom-tabs:nth-child(4)) > .center-bottom-tabs:last-child {
+        .center-bottom:has(> .center-bottom-tabs:nth-child(5)) > .center-bottom-tabs:last-child {
             border-bottom: 0;
         }
     }
