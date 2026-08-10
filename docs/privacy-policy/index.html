@@ -1,0 +1,206 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Smart Duck — Privacy Policy</title>
+        <style>
+            :root {
+                color-scheme: light dark;
+            }
+            body {
+                font-family:
+                    -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial,
+                    sans-serif;
+                max-width: 760px;
+                margin: 0 auto;
+                padding: 48px 20px 80px;
+                line-height: 1.6;
+                color: #1a1a1a;
+                background: #ffffff;
+            }
+            h1 {
+                font-size: 1.75rem;
+                margin-bottom: 0.25rem;
+            }
+            .updated {
+                color: #666;
+                font-size: 0.9rem;
+                margin-bottom: 2rem;
+            }
+            h2 {
+                font-size: 1.2rem;
+                margin-top: 2.25rem;
+                border-bottom: 1px solid #e5e5e5;
+                padding-bottom: 0.4rem;
+            }
+            table {
+                width: 100%;
+                border-collapse: collapse;
+                margin: 1rem 0;
+                font-size: 0.92rem;
+            }
+            th,
+            td {
+                text-align: left;
+                padding: 0.5rem 0.6rem;
+                border: 1px solid #e0e0e0;
+                vertical-align: top;
+            }
+            th {
+                background: #f7f7f7;
+            }
+            code {
+                background: #f2f2f2;
+                padding: 0.1rem 0.35rem;
+                border-radius: 4px;
+                font-size: 0.9em;
+            }
+            ul {
+                padding-left: 1.3rem;
+            }
+            a {
+                color: #0969da;
+            }
+            @media (prefers-color-scheme: dark) {
+                body {
+                    background: #0d1117;
+                    color: #e6edf3;
+                }
+                .updated {
+                    color: #9aa4af;
+                }
+                h2 {
+                    border-bottom-color: #30363d;
+                }
+                th,
+                td {
+                    border-color: #30363d;
+                }
+                th {
+                    background: #161b22;
+                }
+                code {
+                    background: #21262d;
+                }
+                a {
+                    color: #58a6ff;
+                }
+            }
+        </style>
+    </head>
+    <body>
+        <h1>Smart Duck — Privacy Policy</h1>
+        <p class="updated">Last updated: August 2026</p>
+
+        <p>
+            Smart Duck ("the extension") is a browser extension that automatically lowers the volume
+            of background tabs so the tab you're actively focused on stays clearly audible.
+        </p>
+
+        <h2>Data collection</h2>
+        <p>
+            Smart Duck does <strong>not</strong> collect, store, transmit, or sell any personal
+            data, browsing history, or user activity to any external server, third party, or
+            analytics service. Smart Duck has no backend server — it runs entirely on your device.
+        </p>
+
+        <h2>What data the extension reads, and why</h2>
+        <p>
+            To function, Smart Duck reads certain information
+            <strong>locally, within your browser only</strong>:
+        </p>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Data</th>
+                    <th>Purpose</th>
+                    <th>Leaves your device?</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Tab title, favicon, and URL</td>
+                    <td>Displayed in the popup so you can identify which tabs are playing audio</td>
+                    <td>No</td>
+                </tr>
+                <tr>
+                    <td>Whether a tab is currently playing audio (<code>audible</code> state)</td>
+                    <td>Used to detect which tabs need ducking</td>
+                    <td>No</td>
+                </tr>
+                <tr>
+                    <td>
+                        Volume/state of <code>&lt;audio&gt;</code>/<code>&lt;video&gt;</code>
+                        elements on a page
+                    </td>
+                    <td>Used to lower ("duck") background tab volume</td>
+                    <td>No</td>
+                </tr>
+                <tr>
+                    <td>
+                        Captured tab audio stream (for sites like Spotify where standard volume
+                        control doesn't work)
+                    </td>
+                    <td>Routed through a local Web Audio <code>GainNode</code> to adjust volume</td>
+                    <td>No — processed in-memory and discarded, never recorded or saved</td>
+                </tr>
+                <tr>
+                    <td>
+                        Extension settings (theme, ducking level, fade duration, muted/pinned tabs)
+                    </td>
+                    <td>Saved so your preferences persist between sessions</td>
+                    <td>No — stored only in your browser's local extension storage</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <p>
+            None of the above is ever transmitted off your device, sold, shared with third parties,
+            or used for advertising, analytics, or any purpose other than making the extension work.
+        </p>
+
+        <h2>Permissions</h2>
+        <p>Smart Duck requests the following browser permissions, used only as described:</p>
+        <ul>
+            <li>
+                <strong><code>storage</code></strong> — save your settings locally in the browser.
+            </li>
+            <li>
+                <strong><code>tabs</code></strong> — read basic tab info (title, favicon, audible
+                state) to show a list of playing tabs and detect your active tab.
+            </li>
+            <li>
+                <strong><code>scripting</code></strong> — inject the script that finds and adjusts
+                audio/video elements on a page.
+            </li>
+            <li>
+                <strong><code>tabCapture</code></strong> — capture a tab's audio stream for sites
+                where normal volume control doesn't work (e.g. Spotify), so volume can be adjusted
+                via a local Web Audio graph instead.
+            </li>
+            <li>
+                <strong><code>offscreen</code></strong> — required to host the Web Audio processing
+                (<code>AudioContext</code>/<code>GainNode</code>) used by <code>tabCapture</code>,
+                since the background service worker has no DOM.
+            </li>
+            <li>
+                <strong>Host permission (<code>&lt;all_urls&gt;</code>)</strong> — needed because
+                background tabs playing audio can be on any website; the extension only
+                reads/adjusts media playback, never page content, forms, or personal data.
+            </li>
+        </ul>
+
+        <h2>Third parties</h2>
+        <p>Smart Duck does not use any third-party analytics, advertising, or tracking services.</p>
+
+        <h2>Changes to this policy</h2>
+        <p>If this policy changes, the "Last updated" date above will be revised accordingly.</p>
+
+        <h2>Contact</h2>
+        <p>
+            Questions about this policy can be directed to: <strong>izynehowiedev@gmail.com</strong>
+        </p>
+    </body>
+</html>
