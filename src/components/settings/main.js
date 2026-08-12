@@ -85,12 +85,28 @@ export default function Main(root) {
                     })}
                     <div class='${styles['number-container']}'>
                         <label for='volume-fade-duration' class='${styles['center-div-fade-label']}'>Fade duration (seconds)</label>
-                        <input id='volume-fade-duration' type='number' min='0' step='1' value='0' />
+                        <input id='volume-fade-duration' type='number' min='0' max='20' step='1' value='0' />
                         ${InfoButton({
                             title: 'Set how long the volume fade lasts when switching tabs',
                             ariaLabel: 'More information about fade duration',
                         })}
                     </div>
+                </div>
+
+                <div class='${styles['center-div-group']}' role='group' aria-describedby='primary-audible-toggle-desc'>
+                    <span id='primary-audible-toggle-desc' class='${styles['hidden']}'>Only duck background tabs while the active tab is itself playing audio</span>
+                    <label for='checkbox-primary-audible' class='${styles['center-div-sematics-label']}'>Duck only when tab is playing:</label>
+                    <div class='${styles['checkbox-container']}'>
+                        <label class='${styles['checkbox-switch']}'>
+                            <input id='checkbox-primary-audible' type='checkbox'/>
+                            <span class='${styles['checkbox-slider']}'></span>
+                        </label>
+                    </div>
+                    ${InfoButton({
+                        title: 'Background tabs are only ducked while your active tab is actually making sound. If your active tab is silent, background tabs play at full volume.',
+                        ariaLabel:
+                            'More information about only ducking when the active tab is playing',
+                    })}
                 </div>
             </div>
         </section>

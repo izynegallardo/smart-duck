@@ -15,6 +15,7 @@ export default function Event() {
 
         let onRatingsChange = null
         let onSemanticsChange = null
+        let onPrimaryAudibleChange = null
         let onVolumeInput = null
         let debouncedUpdate = null
 
@@ -57,6 +58,26 @@ export default function Event() {
             checkboxSemanticsEl.checked = settings.useOppositeSematics
         }
 
+        function handleDuckOnlyWhenPrimaryAudible(settings) {
+            const checkboxPrimaryAudibleEl = document.getElementById('checkbox-primary-audible')
+            if (!checkboxPrimaryAudibleEl) return
+
+            if (!onPrimaryAudibleChange) {
+                onPrimaryAudibleChange = () => {
+                    updateSettings({
+                        duckOnlyWhenPrimaryAudible: checkboxPrimaryAudibleEl.checked,
+                    })
+                }
+
+                checkboxPrimaryAudibleEl.addEventListener('change', onPrimaryAudibleChange)
+                registerCleanup(() => {
+                    checkboxPrimaryAudibleEl.removeEventListener('change', onPrimaryAudibleChange)
+                })
+            }
+
+            checkboxPrimaryAudibleEl.checked = settings.duckOnlyWhenPrimaryAudible
+        }
+
         function updateFadeDuration(settings) {
             const volumeFadeDurationEl = document.getElementById('volume-fade-duration')
             if (!volumeFadeDurationEl) return
@@ -71,6 +92,12 @@ export default function Event() {
             if (!onVolumeInput) {
                 onVolumeInput = (event) => {
                     // console.log(`raw input: ${event.target.valueAsNumber}`)
+                    if (volumeFadeDurationEl.value < 0) {
+                        volumeFadeDurationEl.valueAsNumber = 1
+                    } else if (volumeFadeDurationEl.value > 20) {
+                        volumeFadeDurationEl.valueAsNumber = 20
+                    }
+
                     debouncedUpdate(event.target.valueAsNumber)
                 }
 
@@ -92,6 +119,7 @@ export default function Event() {
             handleHideRatings(settings)
             handleSwitchSemantics(settings)
             updateFadeDuration(settings)
+            handleDuckOnlyWhenPrimaryAudible(settings)
         })
 
         const unwatchSettings = watchSettings((settings) => {
@@ -100,6 +128,7 @@ export default function Event() {
             handleHideRatings(settings)
             handleSwitchSemantics(settings)
             updateFadeDuration(settings)
+            handleDuckOnlyWhenPrimaryAudible(settings)
         })
 
         return () => {

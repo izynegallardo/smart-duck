@@ -6,6 +6,32 @@ const tabState = new Map()
 const tabOverrides = new Map()
 let focusedWindowId = null
 let primaryTabId = null
+let lastPrimaryAudible = false
+
+function isPrimaryTabAudible() {
+    return tabState.get(primaryTabId)?.audible ?? false
+}
+
+async function broadcastPrimaryAudible(value, excludeTabIds = []) {
+    const tabs = await browser.tabs.query({})
+
+    for (const tab of tabs) {
+        if (tab.id == null || excludeTabIds.includes(tab.id)) continue
+
+        sendTabMessage(tab.id, MSG.PRIMARY_AUDIBLE_CHANGED, {
+            isPrimaryAudible: value,
+        }).catch(() => {})
+    }
+}
+
+function checkPrimaryAudible() {
+    const current = isPrimaryTabAudible()
+
+    if (current === lastPrimaryAudible) return
+
+    lastPrimaryAudible = current
+    broadcastPrimaryAudible(current)
+}
 
 const captureStateByTab = new Map()
 const PENDING_CAPTURE_TIMEOUT_MS = 8000
@@ -85,10 +111,7 @@ function computeSummary() {
             name: truncate(state.title, 50),
             domain: new URL(state.url).hostname,
             url: state.url,
-            status:
-                state.elements.some((element) => element.playing) || state.audible
-                    ? 'playing'
-                    : 'stopped',
+            status: state.audible ? 'playing' : 'stopped',
             ducked: state.ducked,
             muted: state.muted,
             volume: state.volume,
@@ -106,7 +129,7 @@ export default defineBackground(() => {
         if (message.type === MSG.MEDIA_STATE_CHANGED && sender.tab) {
             if (message.payload.url !== sender.tab.url) return
 
-            if (message.payload.elements.length === 0 && !sender.tab.audible) {
+            if (!sender.tab.audible) {
                 tabState.delete(sender.tab.id)
             } else {
                 tabState.set(sender.tab.id, {
@@ -119,6 +142,7 @@ export default defineBackground(() => {
                 // console.log('set', tabState)
             }
 
+            checkPrimaryAudible()
             broadcastSummary()
         }
 
@@ -129,6 +153,7 @@ export default defineBackground(() => {
         if (message.type === MSG.GET_PRIMARY) {
             sendResponse({
                 isPrimary: sender.tab?.id === primaryTabId,
+                isPrimaryAudible: isPrimaryTabAudible(),
             })
         }
 
@@ -245,7 +270,7 @@ export default defineBackground(() => {
         if (changeInfo.audible !== undefined) {
             const current = tabState.get(tabId)
 
-            if (!changeInfo.audible && (!current || current.elements.length === 0)) {
+            if (!changeInfo.audible) {
                 tabState.delete(tabId)
             } else {
                 tabState.set(tabId, {
@@ -261,6 +286,7 @@ export default defineBackground(() => {
                 })
             }
 
+            checkPrimaryAudible()
             broadcastSummary()
         }
     })
@@ -271,11 +297,25 @@ export default defineBackground(() => {
         const oldTabId = primaryTabId
         primaryTabId = tabId
 
+        const audible = isPrimaryTabAudible()
+        const audibleChanged = audible !== lastPrimaryAudible
+        lastPrimaryAudible = audible
+
         if (oldTabId != null) {
-            sendTabMessage(oldTabId, MSG.PRIMARY_CHANGED, { isPrimary: false }).catch(() => {})
+            sendTabMessage(oldTabId, MSG.PRIMARY_CHANGED, {
+                isPrimary: false,
+                isPrimaryAudible: audible,
+            }).catch(() => {})
         }
 
-        sendTabMessage(primaryTabId, MSG.PRIMARY_CHANGED, { isPrimary: true }).catch(() => {})
+        sendTabMessage(primaryTabId, MSG.PRIMARY_CHANGED, {
+            isPrimary: true,
+            isPrimaryAudible: audible,
+        }).catch(() => {})
+
+        if (audibleChanged) {
+            broadcastPrimaryAudible(audible, [oldTabId, primaryTabId])
+        }
     }
 
     ;(async () => {

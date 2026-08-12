@@ -4,12 +4,14 @@ import { getSettings, watchSettings } from '@/core/storage'
 import { MSG, sendMessage } from '@/core/messaging'
 import debounce from '@/utils/debounce'
 
+const SLIDER_FADE_DURATION = 0.3
+
 export default defineContentScript({
     matches: ['<all_urls>'],
     allFrames: true,
     async main() {
         let settings = await getSettings()
-        let isPrimary = (await sendMessage(MSG.GET_PRIMARY)).isPrimary
+        let { isPrimary, isPrimaryAudible } = await sendMessage(MSG.GET_PRIMARY)
         let isCaptured = (await sendMessage(MSG.GET_CAPTURE_STATE)).isCaptured
         let isDucked = false
         let {
@@ -18,9 +20,12 @@ export default defineContentScript({
             volume: tabVolume,
         } = await sendMessage(MSG.GET_TAB_OVERRIDE)
 
-        function applyDuckState(shouldFade = true) {
+        function applyDuckState(shouldFade = true, fadeDurationOverride = null) {
             let mediaElements = findMediaElements()
-            isDucked = settings.autoDuckEnabled && !isPrimary
+            isDucked =
+                settings.autoDuckEnabled &&
+                !isPrimary &&
+                (!settings.duckOnlyWhenPrimaryAudible || isPrimaryAudible)
 
             const rawLevel = isMuted
                 ? 0
@@ -37,7 +42,7 @@ export default defineContentScript({
                     ? toBackgroundVolume(rawLevel, settings.useOppositeSematics)
                     : rawLevel
 
-            const fadeDuration = shouldFade ? settings.fadeDuration : 0
+            const fadeDuration = shouldFade ? (fadeDurationOverride ?? settings.fadeDuration) : 0
 
             if (isCaptured) {
                 sendMessage(MSG.SET_CAPTURED_VOLUME, {
@@ -74,7 +79,8 @@ export default defineContentScript({
         watchSettings((newSettings) => {
             const duckLevelChanged = newSettings.duckLevel !== settings.duckLevel
             settings = newSettings
-            applyDuckState(!duckLevelChanged)
+
+            applyDuckState(true, duckLevelChanged ? SLIDER_FADE_DURATION : null)
         })
 
         browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
@@ -89,13 +95,22 @@ export default defineContentScript({
 
             if (message.type === MSG.PRIMARY_CHANGED) {
                 isPrimary = message.payload.isPrimary
+                isPrimaryAudible = message.payload.isPrimaryAudible
+                applyDuckState(true)
+            }
+
+            if (message.type === MSG.PRIMARY_AUDIBLE_CHANGED) {
+                isPrimaryAudible = message.payload.isPrimaryAudible
                 applyDuckState(true)
             }
 
             if (message.type === MSG.TAB_OVERRIDE_CHANGED) {
+                const volumeChanged = message.payload.volume !== tabVolume
+
                 isMuted = message.payload.muted
                 tabVolume = message.payload.volume
-                applyDuckState(false)
+
+                applyDuckState(volumeChanged, volumeChanged ? SLIDER_FADE_DURATION : null)
             }
 
             if (message.type === MSG.CAPTURE_STATE_CHANGED) {

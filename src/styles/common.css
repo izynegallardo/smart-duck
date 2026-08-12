@@ -8,29 +8,8 @@
     font-weight: 400;
 
     color-scheme: light dark;
-    --sunset: linear-gradient(
-        to bottom,
-        #29288f 0%,
-        #4149c2 28%,
-        #7184dc 65%,
-        #a4a6cc 76%,
-        #be8c91 83%,
-        #b25b75 90%,
-        #6c2c6b 96%,
-        #30218a 100%
-    );
-    --deep: linear-gradient(
-        to bottom,
-        #e8f5f5 0%,
-        #c8e5e9 4%,
-        #8fc7d2 40%,
-        #3d8da3 52%,
-        #0b536c 66%,
-        #082e45 82%,
-        #071a2c 100%
-    );
 
-    text-rendering: optimizeLegibility;
+    --deep: text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     -webkit-text-size-adjust: 100%;
@@ -74,11 +53,30 @@ body.night {
 }
 
 body.sunset {
-    --surface: var(--sunset);
+    --surface: linear-gradient(
+        to bottom,
+        #29288f 0%,
+        #4149c2 28%,
+        #7184dc 65%,
+        #a4a6cc 76%,
+        #be8c91 83%,
+        #b25b75 90%,
+        #6c2c6b 96%,
+        #30218a 100%
+    );
 }
 
 body.deep {
-    --surface: var(--deep);
+    --surface: linear-gradient(
+        to bottom,
+        #e8f5f5 0%,
+        #c8e5e9 4%,
+        #8fc7d2 40%,
+        #3d8da3 52%,
+        #0b536c 66%,
+        #082e45 82%,
+        #071a2c 100%
+    );
 }
 
 *,

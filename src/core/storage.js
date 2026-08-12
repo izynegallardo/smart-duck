@@ -8,6 +8,7 @@ const DEFAULT_SETTINGS = {
     accentTheme: 'none',
     hideRatingsEnabled: false,
     useOppositeSematics: false,
+    duckOnlyWhenPrimaryAudible: false,
 }
 
 export const settingsStorage = storage.defineItem('local:settings', {
