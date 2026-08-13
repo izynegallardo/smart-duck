@@ -10,7 +10,7 @@ export default defineConfig({
         name: 'Smart Duck',
         description:
             'Automatically lowers the volume of background tabs so the tab that matters stays audible.',
-        version: '1.0.0',
+        version: '1.0.1',
         permissions: ['storage', 'tabs', 'scripting', 'tabCapture', 'offscreen'],
         host_permissions: ['<all_urls>'],
         icons: {

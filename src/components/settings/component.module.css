@@ -175,6 +175,26 @@
         }
     }
 
+    .top-div-select {
+        font-size: 1rem;
+        color: var(--text-h);
+        background: #e5f3fa url('../../assets/icons/chevron-down.png') no-repeat 90% center / 20%;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 0.5em 0.9em;
+        min-width: 90px;
+        appearance: none;
+        transition:
+            border-color 0.2s,
+            box-shadow 0.2s,
+            background-color 0.2s;
+    }
+
+    .top-div-select:focus-visible {
+        border-color: var(--accent);
+        box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.06);
+    }
+
     .checkbox-container {
         display: flex;
         place-items: center;
@@ -237,37 +257,30 @@
 
         .bottom-div {
             display: flex;
-            place-items: center;
-            margin: 1.34em 0;
+            flex-direction: column;
+            place-items: start;
+            margin: 1em 0;
             border-radius: 6px;
-            padding: 1.34em;
+            padding: 1em;
             width: 100%;
+            height: 102px;
             background-color: var(--accent-bg);
+            overflow: hidden;
+            transition: overflow 1s;
 
-            .bottom-a {
-                display: flex;
-                place-items: center;
-                color: inherit;
-                transition: 0.3s;
-
-                .chrome-extension-logo {
-                    /* border: 1px solid var(--accent-bg); */
-                    padding: 0.7em;
-                    width: 20%;
-                }
-
-                .bottom-div-span-paragraph {
-                    display: flex;
-                    flex-direction: column;
-                    padding-left: 1.34rem;
-                    width: 100%;
-                }
+            ul {
+                padding-left: 1em;
+                list-style-type: disc;
             }
+        }
 
-            .bottom-a:hover {
-                color: var(--accent);
-                /* text-decoration: underline; */
-            }
+        .bottom-div:hover {
+            overflow: auto;
+        }
+
+        .bottom-span-version {
+            text-align: center;
+            opacity: 0.7;
         }
     }
 }

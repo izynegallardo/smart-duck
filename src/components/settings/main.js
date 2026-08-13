@@ -25,29 +25,17 @@ export default function Main(root) {
                     </label>
                 </div>
 
-                <div class='${styles['top-div-group']} ${styles['no-wrap']} ' role='radiogroup' aria-labelledby='accent-theme-label'>
+                <div class='${styles['top-div-group']} ${styles['no-wrap']}' role='group' aria-labelledby='accent-theme-label'>
                     <span class='${styles['hidden']}'>Choose an accent theme that layers on top of light or dark mode</span>
-                    <label class='${styles['top-div-mode-label']}' id='accent-theme-label'>Accent:</label>
-                    <label class='${styles['top-div-mode-option']}'>
-                        <input type='radio' name='accentTheme' value='none' checked />
-                        <span>None</span>
-                    </label>
-                    <label class='${styles['top-div-mode-option']}'>
-                        <input type='radio' name='accentTheme' value='day' />
-                        <span>Day</span>
-                    </label>
-                    <label class='${styles['top-div-mode-option']}'>
-                        <input type='radio' name='accentTheme' value='night' />
-                        <span>Night</span>
-                    </label>
-                    <label class='${styles['top-div-mode-option']}'>
-                        <input type='radio' name='accentTheme' value='sunset' />
-                        <span>Sunset</span>
-                    </label>
-                    <label class='${styles['top-div-mode-option']}'>
-                        <input type='radio' name='accentTheme' value='deep' />
-                        <span>Deep</span>
-                    </label>
+                    <label class='${styles['top-div-mode-label']}' id='accent-theme-label' for='accent-theme-select'>Accent:</label>
+                    <select id='accent-theme-select' name='accentTheme' class='${styles['top-div-select']}'>
+                        <option value='none'>None</option>
+                        <option value='mist'>Mist</option>
+                        <option value='night'>Night</option>
+                        <option value='sunset'>Sunset</option>
+                        <option value='abyss'>Abyss</option>
+                        <option value='twilight'>Twilight</option>
+                    </select>
                 </div>
                 
                 <div class='${styles['top-div-group']}' role='group' aria-describedby='ratings-toggle-desc'>
@@ -112,16 +100,17 @@ export default function Main(root) {
         </section>
         
         <section class='${styles['bottom']}'>
-            <h1>My other extensions</h1>
+            <h1>Troubleshooting</h1>
             <div class='${styles['section-container']}'>
-                <div class='${styles['bottom-div']}'>
-                    <a class='${styles['bottom-a']}' href='https://chromewebstore.google.com' target='_blank'>
-                        <img class='${styles['chrome-extension-logo']}' src='${ChromeExtensionLogo}' alt='chrome extension logo'>
-                        <div class='${styles['bottom-div-span-paragraph']}'>
-                            <span>Available in the</span>
-                            <p>Chrome Web Store</p>
-                        </div>
-                    </a>
+            <div class='${styles['bottom-div']}'>
+                    <ul>
+                        <li>Disable/enable "Auto Duck" or adjust the volume slider</li>
+                        <li>Refresh the tab where the issue occurs</li>
+                        <li>Check if any settings are enabled/disabled</li>
+                        <li>Disable other installed audio extensions</li>
+                        <li>Restart or close the browser</li>
+                        <li>Reinstall the extension</li>
+                    </ul>
                 </div>
             </div>
         </section>

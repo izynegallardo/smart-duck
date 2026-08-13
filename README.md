@@ -99,6 +99,10 @@ Load the extension in Chrome via `chrome://extensions` → **Load unpacked** →
 
 - **Deep audio control requires a manual trigger, per tab.** Chrome only allows `chrome.tabCapture` to start after a real user gesture (e.g. touching a volume slider) — Smart Duck can't silently start capturing a tab's real output the instant it begins playing. Mute, pin, and visibility work immediately on any tab; deep volume/ducking control on Web-Audio/DRM sites (Spotify, Scrimba, etc.) only kicks in after that first touch.
 
+## Privacy Policy
+
+[View our Privacy Policy](https://izynegallardo.github.io/smart-duck/)
+
 ## License
 
 This project is licensed under the [MIT License](LICENSE).

@@ -35,6 +35,13 @@
             }
         }
 
+        .left-div {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 18em;
+        }
+
         h1 {
             font-size: 1.34rem;
         }

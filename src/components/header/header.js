@@ -1,6 +1,7 @@
 import styles from './component.module.css'
 import SmartDuckLogo from '@/assets/logo.svg'
 import { updateIcons } from '@/helpers/lucide'
+import pkg from '../../../package.json'
 
 /**
  * Shared header for every page in the popup.
@@ -23,8 +24,9 @@ export default function Header(
                     <i class="fa-solid fa-angle-left"></i>
                 </a>
             </div>
-            <div>
+            <div class='${styles['left-div']}'>
                 <h1>${title}</h1>
+                <span>v${pkg.version}</span>
             </div>
         `
         : `

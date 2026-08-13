@@ -9,7 +9,7 @@
 
     color-scheme: light dark;
 
-    --deep: text-rendering: optimizeLegibility;
+    text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     -webkit-text-size-adjust: 100%;
@@ -36,14 +36,15 @@
 
 body.dark,
 body.night,
-body.sunset {
+body.sunset,
+body.twilight {
     --surface: var(--accent-bg);
     --fg: rgba(255, 255, 255, 0.87);
 }
 
 /* Accent Themes */
 
-body.day {
+body.mist {
     --surface: linear-gradient(to bottom, #f8fcfd 0%, #eef9fc 35%, #dff3fa 68%, #c9eaf7 100%);
     --fg: var(--text-h);
 }
@@ -66,7 +67,7 @@ body.sunset {
     );
 }
 
-body.deep {
+body.abyss {
     --surface: linear-gradient(
         to bottom,
         #e8f5f5 0%,
@@ -79,10 +80,20 @@ body.deep {
     );
 }
 
+body.twilight {
+    --surface: url('../assets/background/twilight.jpeg');
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+
 *,
 ::before,
 ::after {
     box-sizing: border-box;
+}
+
+* {
+    scrollbar-width: thin;
 }
 
 a {
@@ -104,6 +115,7 @@ body {
     margin: 0;
     min-width: 380px;
     /* min-height: 100vh; */
+    max-height: 600px;
     background: var(--surface);
     color: var(--fg);
     transition: background 0.4s ease-in-out;

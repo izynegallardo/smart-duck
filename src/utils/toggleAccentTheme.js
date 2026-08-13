@@ -1,9 +1,9 @@
 import { getSettings, updateSettings } from '@/core/storage'
 
-const ACCENT_CLASSES = ['day', 'night', 'sunset', 'deep']
+const ACCENT_CLASSES = ['mist', 'night', 'sunset', 'abyss', 'twilight']
 
 export default async function toggleAccentTheme() {
-    const accentThemeRadioBtns = document.querySelectorAll('input[name="accentTheme"]')
+    const accentThemeSelect = document.querySelector('select[name="accentTheme"]')
 
     function applyAccentTheme(accentTheme) {
         ACCENT_CLASSES.forEach((className) => document.body.classList.remove(className))
@@ -18,15 +18,12 @@ export default async function toggleAccentTheme() {
 
     applyAccentTheme(currentAccentTheme)
 
-    accentThemeRadioBtns.forEach((radio) => {
-        radio.checked = radio.value === currentAccentTheme
+    if (!accentThemeSelect) return
 
-        radio.addEventListener('change', async (event) => {
-            if (event.target.checked) {
-                const selectedValue = event.target.value
-                applyAccentTheme(selectedValue)
-                await updateSettings({ accentTheme: selectedValue })
-            }
-        })
+    accentThemeSelect.value = currentAccentTheme
+    accentThemeSelect.addEventListener('change', async (event) => {
+        const selectedValue = event.target.value
+        applyAccentTheme(selectedValue)
+        await updateSettings({ accentTheme: selectedValue })
     })
 }

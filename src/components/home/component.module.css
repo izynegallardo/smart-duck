@@ -139,7 +139,6 @@
             place-items: center;
             height: 316px;
             overflow-y: overlay;
-            scrollbar-width: thin;
             overflow-x: hidden;
             transition: height 0.3s;
 
