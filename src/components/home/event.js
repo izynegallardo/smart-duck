@@ -4,6 +4,7 @@ import toggleTheme from '@/utils/toggleTheme'
 import toggleAccentTheme from '@/utils/toggleAccentTheme'
 import rate from '@/utils/rate'
 import hideRatingsSectionUI from '@/utils/hideRatings'
+import showToast from '@/components/toast/main'
 import { MSG, sendMessage } from '@/core/messaging'
 import { getSettings, updateSettings, watchSettings } from '@/core/storage'
 import { updateIcons } from '@/helpers/lucide'
@@ -84,7 +85,19 @@ export default function Event() {
                 patch: { volume: Number(event.target.value) },
             })
 
-            sendMessage(MSG.REQUEST_CAPTURE, { tabId })
+            sendMessage(MSG.REQUEST_CAPTURE, { tabId }).then((result) => {
+                if (result?.reason !== 'tab_not_active' || result.toastDelivered) return
+
+                const tab = lastTabs.find((t) => t.id === tabId)
+
+                showToast(
+                    `Switch to "${tab?.name ?? 'this tab'}" once to enable deep volume control — after that you can adjust it from anywhere.`,
+                    {
+                        actionLabel: 'Go to Page',
+                        onAction: () => sendMessage(MSG.GO_TO_TAB, { tabId }),
+                    },
+                )
+            })
         }
         addEventListenerWithCleanup(centerButtom, 'change', onVolumeChange)
 
@@ -147,7 +160,34 @@ export default function Event() {
         const onDuckLevelChange = () => {
             updateSettings({ duckLevel: Number(topRangeEl.value) })
 
-            sendMessage(MSG.REQUEST_CAPTURE)
+            sendMessage(MSG.REQUEST_CAPTURE).then((result) => {
+                // Same fallback reasoning as onVolumeChange above.
+                if (!result?.blockedCount || result.toastDelivered) return
+
+                const tabWord = result.blockedCount === 1 ? 'tab needs' : 'tabs need'
+
+                // Same rotation as content.js's SHOW_TOAST handler: with more
+                // than one blocked tab, the button cycles through them one at
+                // a time on each re-trigger, so the label shows where in that
+                // rotation this click currently is.
+                const actionLabel =
+                    result.blockedTabId == null
+                        ? undefined
+                        : result.blockedCount > 1
+                          ? `Go to Page (${result.actionPosition} of ${result.blockedCount})`
+                          : 'Go to Page'
+
+                showToast(
+                    `${result.blockedCount} background ${tabWord} a quick visit before deep volume control works there.`,
+                    result.blockedTabId != null
+                        ? {
+                              actionLabel,
+                              onAction: () =>
+                                  sendMessage(MSG.GO_TO_TAB, { tabId: result.blockedTabId }),
+                          }
+                        : undefined,
+                )
+            })
         }
         addEventListenerWithCleanup(topRangeEl, 'change', onDuckLevelChange)
 

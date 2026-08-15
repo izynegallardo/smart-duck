@@ -10,7 +10,6 @@
   <img src="https://img.shields.io/badge/WXT-framework-54bc4b?logo=web&logoColor=white" alt="WXT" />
   <img src="https://img.shields.io/badge/JavaScript-Vanilla-f7df1e?logo=javascript&logoColor=black" alt="Vanilla JavaScript" />
   <img src="https://img.shields.io/badge/Manifest-V3-4285F4?logo=googlechrome&logoColor=white" alt="Manifest V3" />
-  <img src="https://img.shields.io/badge/version-1.0.0-blue" alt="Version" />
   <img src="https://img.shields.io/badge/license-MIT-green" alt="MIT License" />
 </p>
 
@@ -101,7 +100,9 @@ Load the extension in Chrome via `chrome://extensions` → **Load unpacked** →
 
 ## Privacy Policy
 
-[View our Privacy Policy](https://izynegallardo.github.io/smart-duck/)
+Smart Duck does not collect, store, transmit, or sell any personal data, browsing history, or user activity to any external server, third party, or analytics service. Smart Duck has no backend server, it runs entirely on your device.
+
+For more information, please see the [Privacy Policy](https://izynegallardo.github.io/smart-duck/).
 
 ## License
 

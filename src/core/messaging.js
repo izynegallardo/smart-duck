@@ -24,6 +24,11 @@ export const MSG = {
     CAPTURE_STATE_CHANGED: 'CAPTURE_STATE_CHANGED',
     SET_CAPTURED_VOLUME: 'SET_CAPTURED_VOLUME',
     STOP_CAPTURE: 'STOP_CAPTURE',
+
+    GET_CAPTURED_TABS: 'GET_CAPTURED_TABS',
+
+    SHOW_TOAST: 'SHOW_TOAST',
+    GO_TO_TAB: 'GO_TO_TAB',
 }
 
 export function sendMessage(type, payload) {

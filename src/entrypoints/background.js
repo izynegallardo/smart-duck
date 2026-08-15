@@ -8,10 +8,18 @@ let focusedWindowId = null
 let primaryTabId = null
 let lastPrimaryAudible = false
 
+/**
+ * @returns {boolean}
+ */
 function isPrimaryTabAudible() {
     return tabState.get(primaryTabId)?.audible ?? false
 }
 
+/**
+ * @param {boolean} value
+ * @param {number[]} [excludeTabIds=[]]
+ * @returns {Promise<void>}
+ */
 async function broadcastPrimaryAudible(value, excludeTabIds = []) {
     const tabs = await browser.tabs.query({})
 
@@ -59,10 +67,82 @@ async function ensureOffscreenDocument() {
     return offscreenReadyPromise
 }
 
+async function reconcileCaptureState() {
+    const existingContexts = await browser.runtime.getContexts({
+        contextTypes: ['OFFSCREEN_DOCUMENT'],
+    })
+
+    if (existingContexts.length === 0) return
+
+    offscreenReadyPromise = Promise.resolve()
+
+    let capturedTabs
+
+    try {
+        capturedTabs = await sendMessage(MSG.GET_CAPTURED_TABS)
+    } catch (error) {
+        return
+    }
+
+    if (!Array.isArray(capturedTabs)) return
+
+    for (const { tabId, generation } of capturedTabs) {
+        captureStateByTab.set(tabId, { status: 'active', generation })
+        sendTabMessage(tabId, MSG.CAPTURE_STATE_CHANGED, { isCaptured: true }).catch(() => {})
+    }
+}
+
+const captureReadyWaiters = new Map()
+
+/**
+ * @param {number} tabId
+ * @returns {Promise<void>}
+ */
+function waitForCaptureSettled(tabId) {
+    return new Promise((resolve) => {
+        captureReadyWaiters.set(tabId, resolve)
+    })
+}
+
+/**
+ * @param {number} tabId
+ * @returns {void}
+ */
+function notifyCaptureSettled(tabId) {
+    /** @type {Map<number, () => void>} */
+    const resolve = captureReadyWaiters.get(tabId)
+
+    if (!resolve) return
+
+    captureReadyWaiters.delete(tabId)
+    resolve()
+}
+
+/**
+ * @param {number} tabId
+ * @returns {Promise<{
+ *   status: 'active' | 'pending' | 'idle',
+ *   reason?: 'tab_not_active' | 'error'
+ * }>}
+ */
 async function requestCaptureForTab(tabId) {
     const state = captureStateByTab.get(tabId)
 
-    if (state?.status === 'pending' || state?.status === 'active') return
+    if (state?.status === 'pending' || state?.status === 'active') {
+        return { status: state.status }
+    }
+
+    let targetTab
+
+    try {
+        targetTab = await browser.tabs.get(tabId)
+    } catch (error) {
+        return { status: 'idle', reason: 'error' }
+    }
+
+    if (!targetTab.active) {
+        return { status: 'idle', reason: 'tab_not_active' }
+    }
 
     const generation = (state?.generation ?? 0) + 1
 
@@ -75,6 +155,8 @@ async function requestCaptureForTab(tabId) {
             status: 'idle',
             generation,
         })
+
+        notifyCaptureSettled(tabId)
     }, PENDING_CAPTURE_TIMEOUT_MS)
 
     captureStateByTab.set(tabId, {
@@ -86,16 +168,45 @@ async function requestCaptureForTab(tabId) {
     try {
         const streamId = await browser.tabCapture.getMediaStreamId({ targetTabId: tabId })
         await ensureOffscreenDocument()
+
+        const settled = waitForCaptureSettled(tabId)
         sendMessage(MSG.CAPTURE_STREAM, { tabId, streamId, generation })
+        await settled
+
+        const finalState = captureStateByTab.get(tabId)
+        return finalState?.status === 'active'
+            ? { status: 'active' }
+            : { status: 'idle', reason: 'error' }
     } catch (error) {
         clearTimeout(timeoutId)
         captureStateByTab.set(tabId, {
             status: 'idle',
             generation,
         })
+        notifyCaptureSettled(tabId)
+        return { status: 'idle', reason: 'error' }
     }
 }
 
+/**
+ * @returns {{
+ *   tabs: number,
+ *   playing: number,
+ *   ducked: number,
+ *   list: Array<{
+ *     id: number,
+ *     icon?: string,
+ *     name: string,
+ *     domain: string,
+ *     url: string,
+ *     status: 'playing' | 'stopped',
+ *     ducked: boolean,
+ *     muted: boolean,
+ *     volume: number | null,
+ *     pinned: boolean
+ *   }>
+ * }}
+ */
 function computeSummary() {
     const states = [...tabState.values()]
 
@@ -122,6 +233,63 @@ function computeSummary() {
 
 function broadcastSummary() {
     sendMessage(MSG.SUMMARY_CHANGED, computeSummary()).catch(() => {})
+}
+
+const INJECTABLE_URL_PATTERN = /^https?:\/\//
+
+async function hydrateAlreadyOpenTabs() {
+    const tabs = await browser.tabs.query({})
+
+    for (const tab of tabs) {
+        if (tab.id == null || !tab.url || !INJECTABLE_URL_PATTERN.test(tab.url)) continue
+
+        try {
+            await browser.scripting.executeScript({
+                target: { tabId: tab.id, allFrames: true },
+                files: ['content-scripts/content.js'],
+            })
+        } catch (error) {
+            continue
+        }
+
+        if (tab.audible && !tabState.has(tab.id)) {
+            tabState.set(tab.id, {
+                elements: [],
+                ducked: false,
+                muted: tabOverrides.get(tab.id)?.muted ?? false,
+                volume: tabOverrides.get(tab.id)?.volume ?? null,
+                title: tab.title,
+                url: tab.url,
+                favIconUrl: tab.favIconUrl,
+                audible: true,
+            })
+        }
+    }
+
+    checkPrimaryAudible()
+    broadcastSummary()
+}
+
+let lastOfferedBlockedTabId = null
+
+/**
+ * @param {number[]} blockedTabIds
+ * @returns {{
+ *   tabId: number,
+ *   position: number,
+ *   total: number
+ * } | null}
+ */
+function pickNextBlockedTab(blockedTabIds) {
+    if (blockedTabIds.length === 0) return null
+
+    const ordered = [...blockedTabIds].reverse()
+    const lastIndex = ordered.indexOf(lastOfferedBlockedTabId)
+    const nextIndex = (lastIndex + 1) % ordered.length
+
+    lastOfferedBlockedTabId = ordered[nextIndex]
+
+    return { tabId: lastOfferedBlockedTabId, position: nextIndex + 1, total: ordered.length }
 }
 
 export default defineBackground(() => {
@@ -180,13 +348,68 @@ export default defineBackground(() => {
         }
 
         if (message.type === MSG.REQUEST_CAPTURE) {
-            if (message.payload?.tabId) {
-                requestCaptureForTab(message.payload.tabId)
-            } else {
-                tabState.forEach((state, tabId) => {
-                    requestCaptureForTab(tabId)
+            if (message.payload?.tabId != null) {
+                const requestedTabId = message.payload.tabId
+
+                requestCaptureForTab(requestedTabId).then(async (result) => {
+                    let toastDelivered = false
+
+                    if (result?.reason === 'tab_not_active' && primaryTabId != null) {
+                        const rawTitle = tabState.get(requestedTabId)?.title
+                        const label = rawTitle ? truncate(rawTitle, 50) : 'this tab'
+
+                        try {
+                            await sendTabMessage(primaryTabId, MSG.SHOW_TOAST, {
+                                message: `Switch to "${label}" once to enable deep volume control for it — after that you can adjust it from anywhere.`,
+                                tabId: requestedTabId,
+                            })
+                            toastDelivered = true
+                        } catch (error) {}
+                    }
+
+                    sendResponse({ ...result, toastDelivered })
                 })
+            } else {
+                const tabIds = [...tabState.keys()]
+
+                Promise.all(tabIds.map((tabId) => requestCaptureForTab(tabId))).then(
+                    async (results) => {
+                        const blockedTabIds = tabIds.filter(
+                            (_, index) => results[index]?.reason === 'tab_not_active',
+                        )
+                        const blockedCount = blockedTabIds.length
+                        const picked = pickNextBlockedTab(blockedTabIds)
+
+                        let toastDelivered = false
+
+                        if (blockedCount > 0 && primaryTabId != null) {
+                            const tabWord = blockedCount === 1 ? 'tab needs' : 'tabs need'
+
+                            try {
+                                await sendTabMessage(primaryTabId, MSG.SHOW_TOAST, {
+                                    message: `${blockedCount} background ${tabWord} a quick visit before deep volume control works there.`,
+                                    tabId: picked?.tabId,
+                                    blockedCount,
+                                    actionPosition: picked?.position,
+                                })
+                                toastDelivered = true
+                            } catch (error) {
+                                // ignored
+                            }
+                        }
+
+                        sendResponse({
+                            blockedCount,
+                            blockedTabId: picked?.tabId,
+                            actionPosition: picked?.position,
+                            total: tabIds.length,
+                            toastDelivered,
+                        })
+                    },
+                )
             }
+
+            return true
         }
 
         if (message.type === MSG.CAPTURE_READY) {
@@ -209,6 +432,8 @@ export default defineBackground(() => {
             } else {
                 captureStateByTab.set(tabId, { status: 'idle', generation })
             }
+
+            notifyCaptureSettled(tabId)
         }
 
         if (message.type === MSG.CAPTURE_ENDED) {
@@ -239,6 +464,21 @@ export default defineBackground(() => {
                 volume,
                 fadeDuration,
             }).catch(() => {})
+        }
+
+        if (message.type === MSG.GO_TO_TAB) {
+            const { tabId } = message.payload
+
+            if (tabId == null) return
+            ;(async () => {
+                try {
+                    const tab = await browser.tabs.get(tabId)
+                    await browser.windows.update(tab.windowId, { focused: true })
+                    await browser.tabs.update(tabId, { active: true })
+                } catch (error) {
+                    // Tab likely closed since the toast was shown — ignored.
+                }
+            })()
         }
     })
 
@@ -291,6 +531,10 @@ export default defineBackground(() => {
         }
     })
 
+    /**
+     * @param {number} tabId
+     * @returns {void}
+     */
     function setPrimaryTab(tabId) {
         if (tabId === primaryTabId) return
 
@@ -325,6 +569,12 @@ export default defineBackground(() => {
             setPrimaryTab(activeTab.id)
         }
     })()
+
+    reconcileCaptureState()
+
+    browser.runtime.onInstalled.addListener(() => {
+        hydrateAlreadyOpenTabs()
+    })
 
     browser.windows.onFocusChanged.addListener(async (windowId) => {
         if (windowId === browser.windows.WINDOW_ID_NONE) return

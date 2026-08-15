@@ -2,9 +2,18 @@ import { browser } from 'wxt/browser'
 import { MSG, sendMessage } from '@/core/messaging'
 import { toVolumeMultiplier } from '@/core/ducking'
 
+/** @type {Map<number, CaptureGraph>} */
 const captureGraphs = new Map()
 
 async function handleCaptureStream({ tabId, streamId, generation }) {
+    const existing = captureGraphs.get(tabId)
+
+    if (existing) {
+        captureGraphs.delete(tabId)
+        existing.stream.getTracks().forEach((track) => track.stop())
+        existing.audioContext.close().catch(() => {})
+    }
+
     try {
         const stream = await navigator.mediaDevices.getUserMedia({
             audio: {
@@ -34,7 +43,7 @@ async function handleCaptureStream({ tabId, streamId, generation }) {
             }).catch(() => {})
         })
 
-        captureGraphs.set(tabId, { audioContext, gainNode, stream })
+        captureGraphs.set(tabId, { audioContext, gainNode, stream, generation })
 
         sendMessage(MSG.CAPTURE_READY, { tabId, generation, success: true }).catch(() => {})
     } catch (error) {
@@ -80,7 +89,13 @@ function handleStopCapture({ tabId }) {
     entry.audioContext.close().catch(() => {})
 }
 
-browser.runtime.onMessage.addListener((message) => {
+/**
+ * @param {{ type: string, payload?: any }} message
+ * @param {browser.runtime.MessageSender} sender
+ * @param {(response?: any) => void} sendResponse
+ * @returns {void}
+ */
+browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
     if (message.type === MSG.CAPTURE_STREAM) {
         handleCaptureStream(message.payload)
     }
@@ -91,5 +106,14 @@ browser.runtime.onMessage.addListener((message) => {
 
     if (message.type === MSG.STOP_CAPTURE) {
         handleStopCapture(message.payload)
+    }
+
+    if (message.type === MSG.GET_CAPTURED_TABS) {
+        sendResponse(
+            [...captureGraphs.entries()].map(([tabId, entry]) => ({
+                tabId,
+                generation: entry.generation,
+            })),
+        )
     }
 })

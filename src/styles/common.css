@@ -8,6 +8,30 @@
     font-weight: 400;
 
     color-scheme: light dark;
+    --mist: linear-gradient(to bottom, #f8fcfd 0%, #eef9fc 35%, #dff3fa 68%, #c9eaf7 100%);
+    --night: linear-gradient(to bottom, #183b4d 0%, #123244 35%, #0d2939 68%, #081d2b 100%);
+    --sunset: linear-gradient(
+        to bottom,
+        #29288f 0%,
+        #4149c2 28%,
+        #7184dc 65%,
+        #a4a6cc 76%,
+        #be8c91 83%,
+        #b25b75 90%,
+        #6c2c6b 96%,
+        #30218a 100%
+    );
+    --abyss: linear-gradient(
+        to bottom,
+        #e8f5f5 0%,
+        #c8e5e9 4%,
+        #8fc7d2 40%,
+        #3d8da3 52%,
+        #0b536c 66%,
+        #082e45 82%,
+        #071a2c 100%
+    );
+    --twilight: url('../assets/background/twilight.jpeg') center / cover no-repeat;
 
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
@@ -45,45 +69,24 @@ body.twilight {
 /* Accent Themes */
 
 body.mist {
-    --surface: linear-gradient(to bottom, #f8fcfd 0%, #eef9fc 35%, #dff3fa 68%, #c9eaf7 100%);
+    --surface: var(--mist);
     --fg: var(--text-h);
 }
 
 body.night {
-    --surface: linear-gradient(to bottom, #183b4d 0%, #123244 35%, #0d2939 68%, #081d2b 100%);
+    --surface: var(--night);
 }
 
 body.sunset {
-    --surface: linear-gradient(
-        to bottom,
-        #29288f 0%,
-        #4149c2 28%,
-        #7184dc 65%,
-        #a4a6cc 76%,
-        #be8c91 83%,
-        #b25b75 90%,
-        #6c2c6b 96%,
-        #30218a 100%
-    );
+    --surface: var(--sunset);
 }
 
 body.abyss {
-    --surface: linear-gradient(
-        to bottom,
-        #e8f5f5 0%,
-        #c8e5e9 4%,
-        #8fc7d2 40%,
-        #3d8da3 52%,
-        #0b536c 66%,
-        #082e45 82%,
-        #071a2c 100%
-    );
+    --surface: var(--abyss);
 }
 
 body.twilight {
-    --surface: url('../assets/background/twilight.jpeg');
-    background-repeat: no-repeat;
-    background-size: cover;
+    --surface: var(--twilight);
 }
 
 *,

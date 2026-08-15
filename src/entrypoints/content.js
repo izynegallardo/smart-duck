@@ -3,8 +3,9 @@ import { findMediaElements, duck, unduck, describeMedia, toBackgroundVolume } fr
 import { getSettings, watchSettings } from '@/core/storage'
 import { MSG, sendMessage } from '@/core/messaging'
 import debounce from '@/utils/debounce'
+import showPageToast from '@/utils/pageToast'
 
-const SLIDER_FADE_DURATION = 0.3
+const SLIDER_FADE_DURATION = 0.1
 
 export default defineContentScript({
     matches: ['<all_urls>'],
@@ -116,6 +117,30 @@ export default defineContentScript({
             if (message.type === MSG.CAPTURE_STATE_CHANGED) {
                 isCaptured = message.payload.isCaptured
                 applyDuckState(false)
+            }
+
+            if (message.type === MSG.SHOW_TOAST) {
+                if (window.self !== window.top) return
+
+                const {
+                    message: toastMessage,
+                    tabId,
+                    blockedCount,
+                    actionPosition,
+                } = message.payload
+
+                const actionLabel =
+                    tabId == null
+                        ? undefined
+                        : blockedCount > 1
+                          ? `Go to Page (${actionPosition} of ${blockedCount})`
+                          : 'Go to Page'
+
+                showPageToast(toastMessage, {
+                    actionLabel,
+                    onAction:
+                        tabId != null ? () => sendMessage(MSG.GO_TO_TAB, { tabId }) : undefined,
+                })
             }
         })
     },
