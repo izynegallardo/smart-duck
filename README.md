@@ -102,7 +102,7 @@ Load the extension in Chrome via `chrome://extensions` → **Load unpacked** →
 
 Ducker does not collect, store, transmit, or sell any personal data, browsing history, or user activity to any external server, third party, or analytics service. Ducker has no backend server, it runs entirely on your device.
 
-For more information, please see the [Privacy Policy](https://izynegallardo.github.io/smart-duck/).
+For more information, please see the [Privacy Policy](https://izynegallardo.github.io/ducker).
 
 ## License
 
