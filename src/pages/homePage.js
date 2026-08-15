@@ -7,7 +7,7 @@ import Events from '@/components/home/event'
 export default function HomePage() {
     const { header, main, footer } = Layout(this.root)
 
-    Header(header, { title: 'Smart Duck', subtitle: 'Audio control', showSettingsLink: true })
+    Header(header, { title: 'Ducker', subtitle: 'Audio control', showSettingsLink: true })
     Main(main)
     Footer(footer)
 

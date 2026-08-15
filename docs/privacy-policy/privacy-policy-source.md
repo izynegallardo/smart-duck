@@ -1,30 +1,30 @@
-# Smart Duck — Privacy Policy
+# Ducker — Privacy Policy
 
 **Last updated:** August 2026
 
-Smart Duck ("the extension") is a browser extension that automatically lowers the volume of background tabs so the tab you're actively focused on stays clearly audible.
+Ducker ("the extension") is a browser extension that automatically lowers the volume of background tabs so the tab you're actively focused on stays clearly audible.
 
 ## Data collection
 
-Smart Duck does **not** collect, store, transmit, or sell any personal data, browsing history, or user activity to any external server, third party, or analytics service. Smart Duck has no backend server — it runs entirely on your device.
+Ducker does **not** collect, store, transmit, or sell any personal data, browsing history, or user activity to any external server, third party, or analytics service. Ducker has no backend server — it runs entirely on your device.
 
 ## What data the extension reads, and why
 
-To function, Smart Duck reads certain information **locally, within your browser only**:
+To function, Ducker reads certain information **locally, within your browser only**:
 
-| Data | Purpose | Leaves your device? |
-|---|---|---|
-| Tab title, favicon, and URL | Displayed in the popup so you can identify which tabs are playing audio | No |
-| Whether a tab is currently playing audio (`audible` state) | Used to detect which tabs need ducking | No |
-| Volume/state of `<audio>`/`<video>` elements on a page | Used to lower ("duck") background tab volume | No |
-| Captured tab audio stream (for sites like Spotify where standard volume control doesn't work) | Routed through a local Web Audio `GainNode` to adjust volume | No — processed in-memory and discarded, never recorded or saved |
-| Extension settings (theme, ducking level, fade duration, muted/pinned tabs) | Saved so your preferences persist between sessions | No — stored only in your browser's local extension storage |
+| Data                                                                                          | Purpose                                                                 | Leaves your device?                                             |
+| --------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------- | --------------------------------------------------------------- |
+| Tab title, favicon, and URL                                                                   | Displayed in the popup so you can identify which tabs are playing audio | No                                                              |
+| Whether a tab is currently playing audio (`audible` state)                                    | Used to detect which tabs need ducking                                  | No                                                              |
+| Volume/state of `<audio>`/`<video>` elements on a page                                        | Used to lower ("duck") background tab volume                            | No                                                              |
+| Captured tab audio stream (for sites like Spotify where standard volume control doesn't work) | Routed through a local Web Audio `GainNode` to adjust volume            | No — processed in-memory and discarded, never recorded or saved |
+| Extension settings (theme, ducking level, fade duration, muted/pinned tabs)                   | Saved so your preferences persist between sessions                      | No — stored only in your browser's local extension storage      |
 
 None of the above is ever transmitted off your device, sold, shared with third parties, or used for advertising, analytics, or any purpose other than making the extension work.
 
 ## Permissions
 
-Smart Duck requests the following browser permissions, used only as described:
+Ducker requests the following browser permissions, used only as described:
 
 - **`storage`** — save your settings locally in the browser.
 - **`tabs`** — read basic tab info (title, favicon, audible state) to show a list of playing tabs and detect your active tab.
@@ -35,7 +35,7 @@ Smart Duck requests the following browser permissions, used only as described:
 
 ## Third parties
 
-Smart Duck does not use any third-party analytics, advertising, or tracking services.
+Ducker does not use any third-party analytics, advertising, or tracking services.
 
 ## Changes to this policy
 

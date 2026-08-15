@@ -1,8 +1,8 @@
 <p align="center">
-  <img src="src/assets/logo.svg" alt="Smart Duck logo" width="120" />
+  <img src="src/assets/logo.svg" alt="Ducker logo" width="120" />
 </p>
 
-<h1 align="center">Smart Duck</h1>
+<h1 align="center">Ducker</h1>
 
 <p align="center">A browser extension that automatically lowers (ducks) the volume of background tabs so the tab you're actually focused on stays clearly audible.</p>
 
@@ -32,7 +32,7 @@
 
 ## How it works
 
-Smart Duck ducks audio in two ways depending on the site:
+Ducker ducks audio in two ways depending on the site:
 
 1. **DOM-based ducking** — for most sites, it finds `<audio>`/`<video>` elements on the page and adjusts `element.volume` directly.
 2. **Tab capture ducking** — for sites that control audio through the Web Audio API or DRM (where `.volume` has no effect, like Spotify), it captures the tab's audio stream via `chrome.tabCapture`, routes it through an offscreen `AudioContext`/`GainNode`, and adjusts volume there instead. This requires a one-time user gesture (e.g. touching a volume slider) per tab, per Chrome's security model.
@@ -96,11 +96,11 @@ Load the extension in Chrome via `chrome://extensions` → **Load unpacked** →
 
 ## Known limitations
 
-- **Deep audio control requires a manual trigger, per tab.** Chrome only allows `chrome.tabCapture` to start after a real user gesture (e.g. touching a volume slider) — Smart Duck can't silently start capturing a tab's real output the instant it begins playing. Mute, pin, and visibility work immediately on any tab; deep volume/ducking control on Web-Audio/DRM sites (Spotify, Scrimba, etc.) only kicks in after that first touch.
+- **Deep audio control requires a manual trigger, per tab.** Chrome only allows `chrome.tabCapture` to start after a real user gesture (e.g. touching a volume slider) — Ducker can't silently start capturing a tab's real output the instant it begins playing. Mute, pin, and visibility work immediately on any tab; deep volume/ducking control on Web-Audio/DRM sites (Spotify, Scrimba, etc.) only kicks in after that first touch.
 
 ## Privacy Policy
 
-Smart Duck does not collect, store, transmit, or sell any personal data, browsing history, or user activity to any external server, third party, or analytics service. Smart Duck has no backend server, it runs entirely on your device.
+Ducker does not collect, store, transmit, or sell any personal data, browsing history, or user activity to any external server, third party, or analytics service. Ducker has no backend server, it runs entirely on your device.
 
 For more information, please see the [Privacy Policy](https://izynegallardo.github.io/smart-duck/).
 

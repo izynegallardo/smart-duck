@@ -31,7 +31,7 @@ export default function Header(
         `
         : `
             <div class='${styles['logo-div']}'>
-                <img class='${styles['logo-svg']}' src='${SmartDuckLogo}' alt='Smart duck logo, a pixel yellow duck producing sound waves in its beak'>  
+                <img class='${styles['logo-svg']}' src='${SmartDuckLogo}' alt='Ducker logo, a pixel yellow duck producing sound waves in its beak'>  
             </div>
             <div>
                 <h1>${title}</h1>

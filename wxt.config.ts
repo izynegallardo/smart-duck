@@ -7,7 +7,7 @@ export default defineConfig({
     publicDir: 'src/public',
 
     manifest: {
-        name: 'Smart Duck',
+        name: 'Ducker',
         description:
             'Automatically lowers the volume of background tabs so the tab that matters stays audible.',
         version: '1.1.0',
