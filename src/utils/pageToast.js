@@ -38,9 +38,10 @@ const TOAST_CSS = `
     }
     .icon {
         flex: none;
-        color: #0088cc;
-        margin-top: 1px;
         display: flex;
+        justify-content: center;
+        margin-top: 2px;
+        color: #0088cc;
     }
     .message {
         flex: 1;
@@ -52,7 +53,7 @@ const TOAST_CSS = `
         background: none;
         border: none;
         padding: 2px;
-        margin: -2px -2px 0 0;
+        margin: 2px 2px 0 0;
         color: rgba(232, 234, 240, 0.6);
         cursor: pointer;
         border-radius: 4px;

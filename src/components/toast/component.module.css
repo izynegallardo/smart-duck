@@ -36,9 +36,10 @@
 
 .icon {
     flex: none;
-    color: #0088cc;
-    margin-top: 1px;
     display: flex;
+    justify-content: center;
+    margin-top: 2px;
+    color: var(--accent);
 }
 
 .message {
@@ -52,7 +53,7 @@
     background: none;
     border: none;
     padding: 2px;
-    margin: -2px -2px 0 0;
+    margin: 2px 2px 0 0;
     color: rgba(232, 234, 240, 0.6);
     cursor: pointer;
     border-radius: 4px;
@@ -92,7 +93,7 @@
 .bar {
     height: 100%;
     width: 100%;
-    background: #0088cc;
+    background: var(--accent);
     transform-origin: left;
     transition: transform linear;
 }
